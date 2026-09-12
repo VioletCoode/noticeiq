@@ -55,6 +55,10 @@
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  html, body, #root {
+    overscroll-behavior-y: contain;
+  }
+
   body {
     background-color: var(--bg-page);
     color: var(--text-primary);
@@ -64,6 +68,32 @@
   .dark body {
     background-color: var(--bg-page);
     color: var(--text-primary);
+  }
+
+  /* Native PWA feel: Prevent text selection on navigation, controls, buttons, and icons */
+  nav,
+  header,
+  aside,
+  button,
+  [role="button"],
+  [role="tab"],
+  svg {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Ensure notice, task, document, and editorial content remains easily selectable */
+  p,
+  article,
+  section,
+  pre,
+  code,
+  input,
+  textarea,
+  [contenteditable="true"] {
+    user-select: text;
+    -webkit-user-select: text;
   }
 }
 
