@@ -115,6 +115,7 @@ export default function DigitalStudentId({
       const next = {
         ...prev,
         name: updated.name || prev.name,
+        institution: updated.institutionName || updated.institution || prev.institution,
         department: updated.department || prev.department,
         studentId: updated.studentId || prev.studentId
       };
@@ -131,6 +132,7 @@ export default function DigitalStudentId({
     setDbProfile((prev) => ({
       ...prev,
       name: updated.name,
+      institution_name: updated.institutionName || updated.institution || prev?.institution_name,
       department: updated.department,
       student_id: updated.studentId,
       github_url: updated.githubUrl || null,
@@ -171,11 +173,13 @@ export default function DigitalStudentId({
           );
           const resolvedId = prof.student_id || ('CS-2024-' + user.id.slice(0, 4).toUpperCase());
           const resolvedDept = prof.department || 'Computer Science & Engineering';
+          const resolvedInst = prof.institution_name || prof.institution || 'Apex Institute of Technology';
 
           setStudentData((prev) => {
             const updated = {
               ...prev,
               name: resolvedName || prev.name,
+              institution: resolvedInst,
               department: resolvedDept,
               studentId: resolvedId,
               email: user.email || userEmail || prev.email || '',
@@ -206,6 +210,7 @@ export default function DigitalStudentId({
   useEffect(() => {
     const generateQr = async () => {
       const currentName = studentData.name || userName || dbProfile?.name || 'Riddhi Som';
+      const currentInst = studentData.institution || dbProfile?.institution_name || 'Apex Institute of Technology';
       const currentId = studentData.studentId || dbProfile?.student_id || 'CS-2024-8942';
       const currentDept = studentData.department || dbProfile?.department || 'Computer Science & Engineering';
 
@@ -218,6 +223,7 @@ export default function DigitalStudentId({
 
       const queryParams = new URLSearchParams({
         name: currentName,
+        inst: currentInst,
         dept: currentDept,
         ...(ghUrl ? { gh: ghUrl } : {}),
         ...(liUrl ? { li: liUrl } : {})
@@ -806,6 +812,7 @@ export default function DigitalStudentId({
         onClose={() => setIsEditModalOpen(false)}
         initialData={{
           name: studentData.name,
+          institutionName: studentData.institution || dbProfile?.institution_name || 'Apex Institute of Technology',
           department: studentData.department,
           studentId: studentData.studentId,
           githubUrl: dbProfile?.github_url || profiles.find((p) => p.id === 'github')?.url || '',

@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
   name TEXT DEFAULT 'Student',
+  institution_name TEXT DEFAULT 'Apex Institute of Technology',
   department TEXT DEFAULT 'Computer Science & Engineering',
   student_id TEXT DEFAULT 'CS-2024-8942',
   photo_url TEXT,
@@ -91,6 +92,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 );
 
 -- Migration for existing databases:
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS institution_name text DEFAULT 'Apex Institute of Technology';
 -- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS instagram_url text;
 -- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS youtube_url text;
 -- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS twitter_url text;

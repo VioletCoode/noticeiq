@@ -15,7 +15,8 @@ import {
   Plus,
   Link2,
   Code2,
-  Globe
+  Globe,
+  Building2
 } from 'lucide-react';
 import {
   supabase,
@@ -33,6 +34,7 @@ export default function EditProfileModal({
 }) {
   const [formData, setFormData] = useState({
     name: initialData.name || '',
+    institutionName: initialData.institutionName || initialData.institution || '',
     department: initialData.department || '',
     studentId: initialData.studentId || '',
     githubUrl: initialData.githubUrl || '',
@@ -64,6 +66,7 @@ export default function EditProfileModal({
     if (isOpen) {
       setFormData({
         name: initialData.name || '',
+        institutionName: initialData.institutionName || initialData.institution || 'Apex Institute of Technology',
         department: initialData.department || 'Computer Science & Engineering',
         studentId: initialData.studentId || '',
         githubUrl: initialData.githubUrl || '',
@@ -142,6 +145,7 @@ export default function EditProfileModal({
       if (!user) throw new Error('User is not authenticated');
 
       const cleanName = formData.name.trim();
+      const cleanInst = formData.institutionName.trim();
       const cleanDept = formData.department.trim();
       const cleanId = formData.studentId.trim();
 
@@ -165,6 +169,7 @@ export default function EditProfileModal({
 
       const payload = {
         name: cleanName,
+        institution_name: cleanInst || 'Apex Institute of Technology',
         department: cleanDept,
         student_id: cleanId,
         github_url: normalizedGh || null,
@@ -185,6 +190,7 @@ export default function EditProfileModal({
       if (onProfileSaved) {
         onProfileSaved({
           name: cleanName,
+          institutionName: cleanInst || 'Apex Institute of Technology',
           department: cleanDept,
           studentId: cleanId,
           githubUrl: normalizedGh,
@@ -297,6 +303,22 @@ export default function EditProfileModal({
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
                 placeholder="e.g. Alex Johnson"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200/80 dark:border-[#23333d] bg-white dark:bg-[#141f26] text-slate-900 dark:text-[#e6edf2] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)] text-xs font-medium transition-all"
+              />
+            </div>
+
+            {/* Institution / College Name */}
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-slate-600 dark:text-[#8e9fa8] flex items-center gap-1">
+                <Building2 className="w-3 h-3" />
+                <span>Institution / College Name</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.institutionName}
+                onChange={(e) => handleChange('institutionName', e.target.value)}
+                placeholder="e.g. Apex Institute of Technology"
                 className="w-full px-3 py-2 rounded-xl border border-slate-200/80 dark:border-[#23333d] bg-white dark:bg-[#141f26] text-slate-900 dark:text-[#e6edf2] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)] text-xs font-medium transition-all"
               />
             </div>
