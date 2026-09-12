@@ -8,3 +8,10 @@ schedule = "* * * * *"
 [functions.check-reminders]
 verify_jwt = false
 schedule = "*/5 * * * *"
+
+[functions.gmail-oauth-callback]
+verify_jwt = false
+
+[functions.gmail-sync]
+verify_jwt = false
+

@@ -14,7 +14,9 @@ import {
   Lock,
   Check,
   LayoutGrid,
-  Table as TableIcon
+  Table as TableIcon,
+  Mail,
+  RefreshCw
 } from 'lucide-react';
 import TaskCard from '../components/TaskCard';
 import TaskTableView from '../components/TaskTableView';
@@ -22,8 +24,53 @@ import { checkDocumentReadiness } from '../utils/vaultData';
 import { getDeadlineToComparableTimestamp, getEffectivePriority } from '../utils/dateUtils';
 import { requestNotificationPermissionAndRegister } from '../services/notifications';
 import { supabase } from '../services/supabase';
+import { initiateGmailOAuth, getGmailConnectionStatus, syncGmail, disconnectGmail } from '../services/gmail';
 
 const STORAGE_VIEW_MODE_KEY = 'noticeiq_task_view_mode_v1';
+
+function formatRelativeDue(deadline) {
+  if (!deadline) return "without a deadline";
+  const days = Math.ceil((new Date(deadline) - new Date()) / (1000 * 60 * 60 * 24));
+  if (days <= 0) return "due today";
+  if (days === 1) return "due tomorrow";
+  return `due in ${days} days`;
+}
+
+function speakDigest(userName, tasks, onEnd) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+    console.warn('[NoticeIQ] SpeechSynthesis is not supported in this browser.');
+    onEnd?.();
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  const topTasks = (tasks || [])
+    .filter(t => t.status !== 'completed' && !t.completed)
+    .sort((a, b) => new Date(a.deadline || 0) - new Date(b.deadline || 0))
+    .slice(0, 3);
+
+  let text = `Good morning ${userName || 'Student'}. `;
+  if (topTasks.length === 0) {
+    text += "You have no urgent tasks today. Nice work.";
+  } else {
+    text += `You have ${topTasks.length} thing${topTasks.length > 1 ? 's' : ''} that need your attention. `;
+    topTasks.forEach((t, i) => {
+      const dueText = formatRelativeDue(t.deadline);
+      const title = t.title || t.task_name || 'Task';
+      text += `${i + 1}. ${title}, ${dueText}. `;
+    });
+  }
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 1.0;
+  utterance.pitch = 1.0;
+  if (onEnd) {
+    utterance.onend = onEnd;
+    utterance.onerror = onEnd;
+  }
+  window.speechSynthesis.speak(utterance);
+}
 
 
 export default function Dashboard({ 
@@ -37,7 +84,9 @@ export default function Dashboard({
   onNavigateToVault,
   vaultDocs = [],
   userName = 'Riddhi',
-  onUpdateUserName
+  onUpdateUserName,
+  userId,
+  onRefreshTasks
 }) {
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState(userName);
@@ -45,6 +94,133 @@ export default function Dashboard({
   const [showAllTasks, setShowAllTasks] = useState(false);
   const [alertEnabled, setAlertEnabled] = useState(false);
   const [isRegisteringAlerts, setIsRegisteringAlerts] = useState(false);
+
+  // Gmail Sync state
+  const [gmailConnected, setGmailConnected] = useState(false);
+  const [lastSyncedAt, setLastSyncedAt] = useState(null);
+  const [isSyncingGmail, setIsSyncingGmail] = useState(false);
+  const [syncMessage, setSyncMessage] = useState(null);
+
+  // Audio Briefing state
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  const handleToggleBriefing = () => {
+    if (typeof window !== 'undefined' && window.speechSynthesis?.speaking && isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+    setIsSpeaking(true);
+    speakDigest(userName, tasks, () => setIsSpeaking(false));
+  };
+
+  useEffect(() => {
+    let mounted = true;
+    const checkGmail = async () => {
+      let resolvedId = userId;
+      if (!resolvedId) {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          resolvedId = user?.id;
+        } catch {
+          // ignore
+        }
+      }
+      if (!resolvedId) return;
+
+      const res = await getGmailConnectionStatus(resolvedId);
+      if (mounted) {
+        setGmailConnected(res.isConnected);
+        setLastSyncedAt(res.lastSyncedAt);
+      }
+    };
+    checkGmail();
+    return () => { mounted = false; };
+  }, [userId]);
+
+  const handleConnectGmail = () => {
+    let resolvedId = userId;
+    try {
+      initiateGmailOAuth(resolvedId);
+    } catch (err) {
+      setSyncMessage({ type: 'error', text: err.message || 'Failed to initiate Gmail connection' });
+    }
+  };
+
+  const handleManualSync = async () => {
+    let resolvedId = userId;
+    if (!resolvedId) {
+      const { data: { user } } = await supabase.auth.getUser();
+      resolvedId = user?.id;
+    }
+    if (!resolvedId) return;
+
+    setIsSyncingGmail(true);
+    setSyncMessage(null);
+    try {
+      const res = await syncGmail(resolvedId);
+      if (res.success) {
+        setGmailConnected(true);
+        const now = new Date().toISOString();
+        setLastSyncedAt(now);
+        const count = res.data?.tasksCreated || 0;
+        if (count > 0) {
+          setSyncMessage({ type: 'success', text: `Sync complete! ${count} new task${count > 1 ? 's' : ''} added.` });
+        } else {
+          setSyncMessage({ type: 'success', text: 'Inbox scanned: everything is up to date.' });
+        }
+        if (onRefreshTasks) {
+          await onRefreshTasks();
+        }
+      } else {
+        setSyncMessage({ type: 'error', text: res.error || 'Failed to sync emails.' });
+      }
+    } catch (err) {
+      setSyncMessage({ type: 'error', text: err.message || 'Sync error occurred.' });
+    } finally {
+      setIsSyncingGmail(false);
+    }
+  };
+
+  const handleDisconnectGmail = async () => {
+    let resolvedId = userId;
+    if (!resolvedId) {
+      const { data: { user } } = await supabase.auth.getUser();
+      resolvedId = user?.id;
+    }
+    if (!resolvedId) return;
+
+    const confirmed = window.confirm('Disconnect Gmail? Automated notice scanning will stop.');
+    if (!confirmed) return;
+
+    try {
+      const res = await disconnectGmail(resolvedId);
+      if (res.success) {
+        setGmailConnected(false);
+        setLastSyncedAt(null);
+        setSyncMessage({ type: 'success', text: 'Gmail disconnected successfully.' });
+      } else {
+        setSyncMessage({ type: 'error', text: res.error || 'Failed to disconnect.' });
+      }
+    } catch (err) {
+      setSyncMessage({ type: 'error', text: err.message || 'Error disconnecting Gmail.' });
+    }
+  };
+
+  const formatLastSynced = (timestamp) => {
+    if (!timestamp) return 'Never';
+    try {
+      const d = new Date(timestamp);
+      const now = new Date();
+      const diffSec = Math.floor((now - d) / 1000);
+      if (diffSec < 60) return 'Just now';
+      if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
+      if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
+      return d.toLocaleDateString();
+    } catch {
+      return 'Recently';
+    }
+  };
 
   // Sync actual OneSignal subscription status from Supabase profile or SDK
   useEffect(() => {
@@ -274,7 +450,7 @@ export default function Dashboard({
       <div className="bg-white dark:bg-[#1b262d] rounded-3xl p-6 md:p-8 border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden transition-colors">
         {/* Left Column: Greeting + Task count + Capture Notice Pill Button */}
         <div className="space-y-3 z-10 max-w-xl">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             {isEditingName ? (
               <div className="flex items-center gap-2">
                 <span className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-[#e6edf2] tracking-tight">Good morning,</span>
@@ -299,6 +475,15 @@ export default function Dashboard({
                 <Edit2 className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity ml-1" />
               </h1>
             )}
+
+            <button
+              id="dashboard-play-briefing-btn"
+              type="button"
+              onClick={handleToggleBriefing}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-800 dark:text-[#e6edf2] text-xs font-semibold border border-slate-200/70 dark:border-white/10 shadow-2xs transition-all active:scale-95 cursor-pointer"
+            >
+              <span>{isSpeaking ? '⏹️ Stop briefing' : '🔊 Play my briefing'}</span>
+            </button>
           </div>
 
           <p className="text-slate-600 dark:text-[#8e9fa8] text-sm md:text-base font-medium">
@@ -681,6 +866,80 @@ export default function Dashboard({
             <div className="pt-2 flex items-center justify-center gap-1.5 text-slate-400 dark:text-[#8e9fa8] text-[11px] font-medium border-t border-slate-100 dark:border-[#23333d]">
               <Lock className="w-3 h-3 text-[var(--accent-primary)]" />
               <span>Private Client-Side Locker</span>
+            </div>
+          </div>
+
+          {/* GMAIL SYNC CARD */}
+          <div className="rounded-3xl p-6 bg-white dark:bg-[#1b262d] border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs space-y-3.5 transition-all">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-950/40 border border-red-200/60 dark:border-red-900/60 flex items-center justify-center text-red-600 dark:text-red-400 shadow-2xs">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-[#e6edf2]">Gmail Notice Sync</h3>
+                    {gmailConnected && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-[#142922] text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-[#1c483a]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        Connected
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-[#8e9fa8]">
+                    {gmailConnected 
+                      ? (lastSyncedAt ? `Last checked: ${formatLastSynced(lastSyncedAt)}` : 'Monitors circulars every 5m')
+                      : 'Auto-extract notices & deadlines from emails'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {syncMessage && (
+              <div className={`p-2.5 rounded-xl text-xs flex items-center justify-between ${
+                syncMessage.type === 'error'
+                  ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50'
+                  : 'bg-emerald-50 dark:bg-[#142922] text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-[#1c483a]'
+              }`}>
+                <span>{syncMessage.text}</span>
+                <button onClick={() => setSyncMessage(null)} className="text-xs opacity-70 hover:opacity-100 cursor-pointer ml-2 font-bold">×</button>
+              </div>
+            )}
+
+            <div className="pt-1">
+              {!gmailConnected ? (
+                <button
+                  id="dashboard-connect-gmail-btn"
+                  type="button"
+                  onClick={handleConnectGmail}
+                  className="w-full py-2.5 px-4 rounded-xl bg-[var(--accent-primary)] hover:opacity-90 text-white font-bold text-xs transition-all shadow-2xs active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  <span>Connect Gmail</span>
+                </button>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <button
+                    id="dashboard-sync-gmail-btn"
+                    type="button"
+                    onClick={handleManualSync}
+                    disabled={isSyncingGmail}
+                    className="flex-1 py-2.5 px-4 rounded-xl bg-[var(--accent-primary)] hover:opacity-90 text-white font-bold text-xs transition-all shadow-2xs active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isSyncingGmail ? 'animate-spin' : ''}`} />
+                    <span>{isSyncingGmail ? 'Scanning...' : 'Sync Now'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDisconnectGmail}
+                    disabled={isSyncingGmail}
+                    title="Disconnect Gmail"
+                    className="py-2.5 px-3 rounded-xl border border-slate-200 dark:border-[#23333d] hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-300 text-xs font-semibold transition-all cursor-pointer"
+                  >
+                    Disconnect
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 

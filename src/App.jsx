@@ -28,8 +28,9 @@ import {
   upsertProfile,
   fetchUpcomingReminders
 } from './services/supabase';
-import { GraduationCap, AlertTriangle, X } from 'lucide-react';
+import { GraduationCap, AlertTriangle, X, CheckCircle2 } from 'lucide-react';
 import PublicVerifyScreen from './components/PublicVerifyScreen';
+import { exchangeGmailOAuthCode, getGmailConnectionStatus, syncGmail } from './services/gmail';
 
 const THEME_KEY = 'noticeiq_theme';
 
@@ -228,6 +229,103 @@ export default function App() {
       isSubscribed = false;
     };
   }, [session?.user?.id]);
+
+  const [gmailNotice, setGmailNotice] = useState(null);
+
+  // Helper to refresh tasks and reminders
+  const handleRefreshUserData = useCallback(async () => {
+    if (!session?.user?.id) return;
+    try {
+      const [updatedTasks, updatedReminders] = await Promise.all([
+        fetchTasks(session.user.id),
+        fetchUpcomingReminders(session.user.id)
+      ]);
+      if (updatedTasks) setTasks(updatedTasks);
+      if (updatedReminders) setReminders(updatedReminders);
+    } catch (err) {
+      console.warn('[NoticeIQ] Error refreshing tasks/reminders:', err);
+    }
+  }, [session?.user?.id]);
+
+  // Gmail OAuth Callback detection & initial sync
+  useEffect(() => {
+    const handleGmailCallback = async () => {
+      const path = window.location.pathname;
+      const search = window.location.search;
+      const params = new URLSearchParams(search);
+      const code = params.get('code');
+      const state = params.get('state');
+
+      if ((path.includes('/auth/callback/gmail') || path.startsWith('/auth/callback')) && code) {
+        try {
+          const redirectUri = `${window.location.origin}/auth/callback/gmail`;
+          const result = await exchangeGmailOAuthCode(code, redirectUri);
+
+          // Clean URL back to dashboard
+          window.history.replaceState({}, document.title, '/');
+          setActiveTab('dashboard');
+
+          if (result.success) {
+            setGmailNotice({
+              type: 'success',
+              message: 'Gmail connected successfully! Automated 5-minute background monitoring is now active.'
+            });
+
+            const targetUserId = session?.user?.id || state;
+            if (targetUserId) {
+              syncGmail(targetUserId).then(async (syncRes) => {
+                if (syncRes.success) {
+                  await handleRefreshUserData();
+                }
+              }).catch((e) => console.warn('[NoticeIQ] Initial sync error:', e));
+            }
+          } else {
+            setGmailNotice({
+              type: 'error',
+              message: `Failed to connect Gmail: ${result.error || 'Token exchange failed'}`
+            });
+          }
+        } catch (err) {
+          window.history.replaceState({}, document.title, '/');
+          setGmailNotice({
+            type: 'error',
+            message: `Gmail authorization error: ${err.message}`
+          });
+        }
+      }
+    };
+
+    handleGmailCallback();
+  }, [session?.user?.id, handleRefreshUserData]);
+
+  // Background Gmail Polling every 5 minutes
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    const userId = session.user.id;
+
+    const pollGmail = async () => {
+      try {
+        const status = await getGmailConnectionStatus(userId);
+        if (status.isConnected) {
+          console.log('[NoticeIQ] Polling Gmail sync for user:', userId);
+          const syncRes = await syncGmail(userId);
+          if (syncRes.success && syncRes.data?.tasksCreated > 0) {
+            console.log(`[NoticeIQ] Background sync created ${syncRes.data.tasksCreated} new tasks.`);
+            await handleRefreshUserData();
+          }
+        }
+      } catch (err) {
+        console.warn('[NoticeIQ] Gmail background sync poll error:', err);
+      }
+    };
+
+    // Run every 5 minutes (300,000 ms)
+    const intervalId = setInterval(pollGmail, 5 * 60 * 1000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [session?.user?.id, handleRefreshUserData]);
 
   // Persist user name in Supabase
   const handleUpdateUserName = async (newName) => {
@@ -436,6 +534,30 @@ export default function App() {
 
         {/* Main Content Area with Smooth Page Transition */}
         <main className="flex-1 min-h-[calc(100vh-4rem)] overflow-y-auto pb-20 md:pb-8">
+          {gmailNotice && (
+            <div className={`m-4 p-4 rounded-2xl border text-xs flex items-center justify-between gap-3 shadow-xs animate-slide-down ${
+              gmailNotice.type === 'error'
+                ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900/60 text-rose-800 dark:text-rose-200'
+                : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/60 text-emerald-800 dark:text-emerald-200'
+            }`}>
+              <div className="flex items-center gap-2">
+                {gmailNotice.type === 'error' ? (
+                  <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+                ) : (
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                )}
+                <span className="font-semibold">{gmailNotice.message}</span>
+              </div>
+              <button
+                onClick={() => setGmailNotice(null)}
+                className="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                title="Dismiss"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
           {saveError && (
             <div className="m-4 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-800 dark:text-rose-200 text-xs flex items-center justify-between gap-3 shadow-xs animate-slide-down">
               <div className="flex items-center gap-2">
@@ -478,6 +600,8 @@ export default function App() {
                 vaultDocs={vaultDocs}
                 userName={userName}
                 onUpdateUserName={handleUpdateUserName}
+                userId={session?.user?.id}
+                onRefreshTasks={handleRefreshUserData}
               />
             )}
 
