@@ -86,6 +86,13 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   twitter_url TEXT,
   discord_url TEXT,
   custom_links JSONB DEFAULT '[]'::jsonb,
+  summary_bio TEXT,
+  skills JSONB DEFAULT '[]'::jsonb,
+  work_experience JSONB DEFAULT '[]'::jsonb,
+  projects JSONB DEFAULT '[]'::jsonb,
+  certifications JSONB DEFAULT '[]'::jsonb,
+  languages JSONB DEFAULT '[]'::jsonb,
+  availability_status TEXT DEFAULT 'Open to opportunities',
   onesignal_id TEXT,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
@@ -98,6 +105,13 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 -- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS twitter_url text;
 -- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS discord_url text;
 -- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS custom_links jsonb DEFAULT '[]'::jsonb;
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS summary_bio text;
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS skills jsonb DEFAULT '[]'::jsonb;
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS work_experience jsonb DEFAULT '[]'::jsonb;
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS projects jsonb DEFAULT '[]'::jsonb;
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS certifications jsonb DEFAULT '[]'::jsonb;
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS languages jsonb DEFAULT '[]'::jsonb;
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS availability_status text DEFAULT 'Open to opportunities';
 
 -- ----------------------------------------------------------
 -- INDEXES FOR MAXIMUM QUERY PERFORMANCE

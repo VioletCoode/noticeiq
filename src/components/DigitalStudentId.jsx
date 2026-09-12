@@ -15,7 +15,14 @@ import {
   Globe,
   Code2,
   Link2,
-  CheckCircle2
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Briefcase,
+  FolderGit2,
+  Award,
+  Languages,
+  Sparkles
 } from 'lucide-react';
 import { supabase, fetchProfile, upsertProfile, uploadProfilePhoto } from '../services/supabase';
 import EditProfileModal from './EditProfileModal';
@@ -45,6 +52,9 @@ export default function DigitalStudentId({
 
   // Edit Profile Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Expandable Full Portfolio / Profile drawer state
+  const [isPortfolioExpanded, setIsPortfolioExpanded] = useState(false);
 
   // Student Data with localStorage persistence (cleaning up any legacy placeholder names)
   const [studentData, setStudentData] = useState(() => {
@@ -135,6 +145,13 @@ export default function DigitalStudentId({
       institution_name: updated.institutionName || updated.institution || prev?.institution_name,
       department: updated.department,
       student_id: updated.studentId,
+      summary_bio: updated.summaryBio !== undefined ? updated.summaryBio : prev?.summary_bio,
+      availability_status: updated.availabilityStatus !== undefined ? updated.availabilityStatus : prev?.availability_status,
+      skills: updated.skills !== undefined ? updated.skills : prev?.skills,
+      languages: updated.languages !== undefined ? updated.languages : prev?.languages,
+      work_experience: updated.workExperience !== undefined ? updated.workExperience : prev?.work_experience,
+      projects: updated.projects !== undefined ? updated.projects : prev?.projects,
+      certifications: updated.certifications !== undefined ? updated.certifications : prev?.certifications,
       github_url: updated.githubUrl || null,
       linkedin_url: updated.linkedinUrl || null,
       instagram_url: updated.instagramUrl || null,
@@ -806,6 +823,259 @@ export default function DigitalStudentId({
         </div>
       </div>
 
+      {/* ======================================================== */}
+      {/* EXPANDABLE STUDENT PORTFOLIO & FULL PROFILE SECTION      */}
+      {/* ======================================================== */}
+      <div className="w-full max-w-2xl mx-auto rounded-3xl bg-white dark:bg-[#1b262d] border border-slate-200/80 dark:border-[#23333d] p-4 sm:p-5 shadow-sm space-y-3 transition-all">
+        {/* Section Header with Quick Stats & Expand/Collapse button */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-[var(--accent-light)] text-[var(--accent-primary)] flex items-center justify-center border border-[var(--accent-light-border)] shrink-0 shadow-2xs">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-[#e6edf2] uppercase tracking-wider">
+                  Student Portfolio & Profile
+                </h3>
+                {/* Availability status badge */}
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 shadow-2xs">
+                  {dbProfile?.availability_status || '🟢 Open to opportunities'}
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 dark:text-[#8e9fa8]">
+                {(dbProfile?.skills?.length || 0)} Skills • {(dbProfile?.projects?.length || 0)} Projects • {(dbProfile?.work_experience?.length || 0)} Experience
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            <button
+              type="button"
+              onClick={() => setIsEditModalOpen(true)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold text-[var(--accent-text)] bg-[var(--accent-light)] hover:bg-[var(--accent-badge-bg)] border border-[var(--accent-light-border)] transition-all cursor-pointer shadow-2xs"
+              title="Edit Profile"
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>Edit Details</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsPortfolioExpanded(!isPortfolioExpanded)}
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-xl text-xs font-semibold text-slate-700 dark:text-[#e6edf2] bg-slate-100 dark:bg-[#141f26] hover:bg-slate-200 dark:hover:bg-[#1e2f38] border border-slate-200/70 dark:border-[#23333d] transition-colors cursor-pointer shadow-2xs"
+            >
+              <span>{isPortfolioExpanded ? 'Hide Details' : 'View Details'}</span>
+              {isPortfolioExpanded ? (
+                <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Expanded Content */}
+        {isPortfolioExpanded && (
+          <div className="pt-3 border-t border-slate-100 dark:border-[#23333d]/70 space-y-3.5 animate-fade-in">
+            {/* Bio / Summary */}
+            {dbProfile?.summary_bio ? (
+              <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-[#141f26]/60 border border-slate-200/60 dark:border-[#23333d] space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#8e9fa8]">
+                  About Me
+                </span>
+                <p className="text-xs text-slate-700 dark:text-[#d1dce2] leading-relaxed">
+                  {dbProfile.summary_bio}
+                </p>
+              </div>
+            ) : (
+              <div className="p-3 rounded-2xl bg-slate-50/50 dark:bg-[#141f26]/40 border border-dashed border-slate-200/70 dark:border-[#23333d] flex items-center justify-between">
+                <p className="text-xs text-slate-400 italic">No career summary added yet.</p>
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="text-xs font-semibold text-[var(--accent-primary)] hover:underline cursor-pointer"
+                >
+                  + Add Bio
+                </button>
+              </div>
+            )}
+
+            {/* Skills & Languages Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Skills */}
+              <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-[#141f26]/60 border border-slate-200/60 dark:border-[#23333d] space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#8e9fa8] flex items-center gap-1.5">
+                    <Code2 className="w-3 h-3 text-[var(--accent-primary)]" />
+                    <span>Skills & Tools</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    {dbProfile?.skills?.length || 0}
+                  </span>
+                </div>
+                {dbProfile?.skills?.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {dbProfile.skills.map((s, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-[var(--accent-light)] text-[var(--accent-text)] border border-[var(--accent-light-border)] shadow-2xs"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-400 italic">No skills listed yet.</p>
+                )}
+              </div>
+
+              {/* Languages */}
+              <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-[#141f26]/60 border border-slate-200/60 dark:border-[#23333d] space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#8e9fa8] flex items-center gap-1.5">
+                    <Languages className="w-3 h-3 text-[var(--accent-primary)]" />
+                    <span>Languages Known</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    {dbProfile?.languages?.length || 0}
+                  </span>
+                </div>
+                {dbProfile?.languages?.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {dbProfile.languages.map((l, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-[#1e2f38] text-slate-700 dark:text-[#e6edf2] border border-slate-200/70 dark:border-[#23333d]"
+                      >
+                        {l}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-400 italic">No languages listed yet.</p>
+                )}
+              </div>
+            </div>
+
+            {/* Work Experience */}
+            {dbProfile?.work_experience?.length > 0 && (
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#8e9fa8] flex items-center gap-1.5">
+                  <Briefcase className="w-3 h-3 text-[var(--accent-primary)]" />
+                  <span>Work Experience ({dbProfile.work_experience.length})</span>
+                </span>
+                <div className="space-y-2">
+                  {dbProfile.work_experience.map((w, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3 rounded-2xl bg-slate-50/70 dark:bg-[#141f26]/60 border border-slate-200/60 dark:border-[#23333d] space-y-1"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-[#e6edf2]">
+                            {w.role}
+                          </h4>
+                          <p className="text-[11px] font-semibold text-[var(--accent-text)]">
+                            {w.company}
+                          </p>
+                        </div>
+                        {w.duration && (
+                          <span className="text-[10px] font-mono font-medium text-slate-400 shrink-0">
+                            {w.duration}
+                          </span>
+                        )}
+                      </div>
+                      {w.description && (
+                        <p className="text-xs text-slate-600 dark:text-[#8e9fa8] leading-relaxed pt-0.5">
+                          {w.description}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Projects Showcase */}
+            {dbProfile?.projects?.length > 0 && (
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#8e9fa8] flex items-center gap-1.5">
+                  <FolderGit2 className="w-3 h-3 text-[var(--accent-primary)]" />
+                  <span>Featured Projects ({dbProfile.projects.length})</span>
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {dbProfile.projects.map((p, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3 rounded-2xl bg-slate-50/70 dark:bg-[#141f26]/60 border border-slate-200/60 dark:border-[#23333d] space-y-1 flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between gap-2">
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-[#e6edf2] truncate">
+                            {p.title}
+                          </h4>
+                          {p.link && (
+                            <a
+                              href={p.link}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="p-1 rounded text-slate-400 hover:text-[var(--accent-text)]"
+                              title="Open project link"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          )}
+                        </div>
+                        {p.description && (
+                          <p className="text-[11px] text-slate-600 dark:text-[#8e9fa8] line-clamp-2 mt-0.5">
+                            {p.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Certifications */}
+            {dbProfile?.certifications?.length > 0 && (
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#8e9fa8] flex items-center gap-1.5">
+                  <Award className="w-3 h-3 text-[var(--accent-primary)]" />
+                  <span>Certifications & Licenses ({dbProfile.certifications.length})</span>
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {dbProfile.certifications.map((c, idx) => (
+                    <div
+                      key={idx}
+                      className="p-2.5 rounded-xl bg-slate-50/70 dark:bg-[#141f26]/60 border border-slate-200/60 dark:border-[#23333d] flex items-center justify-between gap-2"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-slate-800 dark:text-[#e6edf2] truncate">
+                          {c.name}
+                        </p>
+                        {c.issuer && (
+                          <p className="text-[10px] text-slate-500 dark:text-[#8e9fa8] truncate">
+                            {c.issuer}
+                          </p>
+                        )}
+                      </div>
+                      {c.year && (
+                        <span className="text-[10px] font-mono text-slate-400 shrink-0 font-bold">
+                          {c.year}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Dedicated Centralized Edit Profile Modal */}
       <EditProfileModal
         isOpen={isEditModalOpen}
@@ -815,6 +1085,13 @@ export default function DigitalStudentId({
           institutionName: studentData.institution || dbProfile?.institution_name || 'Apex Institute of Technology',
           department: studentData.department,
           studentId: studentData.studentId,
+          summaryBio: dbProfile?.summary_bio || '',
+          availabilityStatus: dbProfile?.availability_status || 'Open to opportunities',
+          skills: dbProfile?.skills || [],
+          languages: dbProfile?.languages || [],
+          workExperience: dbProfile?.work_experience || [],
+          projects: dbProfile?.projects || [],
+          certifications: dbProfile?.certifications || [],
           githubUrl: dbProfile?.github_url || profiles.find((p) => p.id === 'github')?.url || '',
           linkedinUrl: dbProfile?.linkedin_url || profiles.find((p) => p.id === 'linkedin')?.url || '',
           instagramUrl: dbProfile?.instagram_url || '',
