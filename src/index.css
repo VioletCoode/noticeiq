@@ -212,6 +212,7 @@
 /* 3D Card Flip Utilities */
 .perspective-1000 {
   perspective: 1000px;
+  -webkit-perspective: 1000px;
 }
 
 .preserve-3d {
@@ -226,6 +227,7 @@
 
 .rotate-y-180 {
   transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
 }
 
 /* Guilloché / Security Grid Background for Digital ID */

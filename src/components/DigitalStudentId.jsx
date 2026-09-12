@@ -223,49 +223,40 @@ export default function DigitalStudentId({
     };
   }, [userName, userEmail]);
 
-  // Regenerate QR Code whenever studentData, activeSocials, or dbProfile change
+  // Regenerate QR Code whenever studentId changes
   useEffect(() => {
     const generateQr = async () => {
-      const currentName = studentData.name || userName || dbProfile?.name || 'Riddhi Som';
-      const currentInst = studentData.institution || dbProfile?.institution_name || 'Apex Institute of Technology';
       const currentId = studentData.studentId || dbProfile?.student_id || 'CS-2024-8942';
-      const currentDept = studentData.department || dbProfile?.department || 'Computer Science & Engineering';
 
-      const origin = typeof window !== 'undefined' && window.location.origin
-        ? window.location.origin
-        : 'http://localhost:5173';
+      // Always dynamically use the browser's current live origin at generation time
+      const origin =
+        (typeof window !== 'undefined' && window.location?.origin && window.location.origin !== 'null'
+          ? window.location.origin
+          : '') ||
+        (typeof window !== 'undefined' && window.location?.protocol && window.location?.host
+          ? `${window.location.protocol}//${window.location.host}`
+          : '');
 
-      const ghUrl = profiles.find((p) => p.id === 'github')?.url || dbProfile?.github_url || '';
-      const liUrl = profiles.find((p) => p.id === 'linkedin')?.url || dbProfile?.linkedin_url || '';
-
-      const queryParams = new URLSearchParams({
-        name: currentName,
-        inst: currentInst,
-        dept: currentDept,
-        ...(ghUrl ? { gh: ghUrl } : {}),
-        ...(liUrl ? { li: liUrl } : {})
-      });
-
-      // Clean, mobile-scannable URL encoding student's verification route with fallback parameters
-      const targetVerifyUrl = `${origin}/verify/${encodeURIComponent(currentId)}?${queryParams.toString()}`;
+      // Clean, short mobile-scannable base verification URL without query parameters for minimal QR matrix density
+      const targetVerifyUrl = `${origin}/verify/${encodeURIComponent(currentId)}`;
       setVerifyUrl(targetVerifyUrl);
 
-      // Requirement 2: Log exact URL/payload being encoded into the QR code
+      // Log exact URL/payload being encoded into the QR code
       console.log('====================================================');
       console.log('[NoticeIQ Digital ID] 📱 QR Code URL Being Encoded:');
       console.log(targetVerifyUrl);
       console.log('====================================================');
 
       try {
-        // High Error Correction Level ('H' = 30% recovery) on clean URL payload for instantaneous mobile camera scanning
+        // High-contrast, scannable QR with quiet zone margin >= 3 and 100% black on solid white
         const url = await QRCode.toDataURL(targetVerifyUrl, {
-          width: 320,
-          margin: 1.5,
+          width: 360,
+          margin: 3,
           color: {
-            dark: '#0f3a3a',
+            dark: '#000000',
             light: '#ffffff'
           },
-          errorCorrectionLevel: 'H'
+          errorCorrectionLevel: 'M'
         });
         setQrCodeUrl(url);
       } catch (err) {
@@ -274,7 +265,7 @@ export default function DigitalStudentId({
     };
 
     generateQr();
-  }, [studentData, activeSocials, userName, userEmail, dbProfile]);
+  }, [studentData.studentId, dbProfile?.student_id]);
 
   // Photo upload handler using Supabase Storage
   const handlePhotoUpload = async (e) => {
@@ -461,12 +452,24 @@ export default function DigitalStudentId({
           className={`relative w-full rounded-3xl transition-transform duration-500 preserve-3d shadow-md hover:shadow-xl ${
             isFlipped ? 'rotate-y-180' : ''
           }`}
-          style={{ minHeight: '340px' }}
+          style={{
+            minHeight: '380px',
+            transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+            WebkitTransform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+            transformStyle: 'preserve-3d',
+            WebkitTransformStyle: 'preserve-3d'
+          }}
         >
           {/* ======================================================== */}
           {/* FRONT OF CARD                                            */}
           {/* ======================================================== */}
           <div
+            style={{
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
+              transform: 'rotateY(0deg)',
+              WebkitTransform: 'rotateY(0deg)'
+            }}
             className={`w-full h-full rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#1b262d] border border-slate-200/80 dark:border-[#23333d] backface-hidden relative overflow-hidden flex flex-col justify-between transition-colors ${
               isFlipped ? 'pointer-events-none' : ''
             }`}
@@ -676,6 +679,12 @@ export default function DigitalStudentId({
           {/* BACK OF CARD (QR CODE & SHARING)                        */}
           {/* ======================================================== */}
           <div
+            style={{
+              transform: 'rotateY(180deg)',
+              WebkitTransform: 'rotateY(180deg)',
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden'
+            }}
             className={`w-full h-full rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#1b262d] border border-slate-200/80 dark:border-[#23333d] backface-hidden rotate-y-180 absolute inset-0 flex flex-col justify-between transition-colors ${
               !isFlipped ? 'pointer-events-none' : ''
             }`}
@@ -711,25 +720,20 @@ export default function DigitalStudentId({
             </div>
 
             {/* Back Body: Centered QR Code & Student Summary */}
-            <div className="relative z-10 py-3 flex flex-col sm:flex-row items-center justify-center gap-5">
-              {/* QR Code Container */}
-              <div className="relative p-2.5 bg-white dark:bg-white rounded-2xl shadow-md border-2 border-[var(--accent-primary)] group/qr">
+            <div className="relative z-10 py-2 flex flex-col sm:flex-row items-center justify-center gap-5 flex-1">
+              {/* QR Code Container - Solid white background regardless of theme, ample quiet zone padding */}
+              <div className="p-3 bg-white rounded-2xl shadow-md border-2 border-slate-200 dark:border-slate-300 shrink-0">
                 {qrCodeUrl ? (
                   <img
                     src={qrCodeUrl}
                     alt="Student ID QR Code"
-                    className="w-36 h-36 sm:w-40 sm:h-40 rounded-xl"
+                    className="w-56 h-56 sm:w-60 sm:h-60 block object-contain"
                   />
                 ) : (
-                  <div className="w-36 h-36 sm:w-40 sm:h-40 flex items-center justify-center bg-slate-50 text-slate-400">
-                    <QrCode className="w-8 h-8 animate-spin text-[var(--accent-primary)]" />
+                  <div className="w-56 h-56 sm:w-60 sm:h-60 flex items-center justify-center bg-white text-slate-400">
+                    <QrCode className="w-10 h-10 animate-spin text-slate-500" />
                   </div>
                 )}
-
-                {/* Instant preview badge */}
-                <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-[var(--accent-primary)] text-white text-[9px] font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
-                  Dynamic QR
-                </div>
               </div>
 
               {/* Details & Quick Stats next to QR */}
