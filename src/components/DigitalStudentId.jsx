@@ -449,11 +449,13 @@ export default function DigitalStudentId({
       {/* 3D Card Container with Flip Wrapper */}
       <div className="perspective-1000 w-full max-w-2xl mx-auto">
         <div
-          className={`relative w-full rounded-3xl transition-transform duration-500 preserve-3d shadow-md hover:shadow-xl ${
-            isFlipped ? 'rotate-y-180' : ''
+          className={`relative w-full rounded-3xl transition-all duration-500 preserve-3d shadow-md hover:shadow-xl ${
+            isFlipped 
+              ? 'rotate-y-180 min-h-[500px] sm:min-h-[420px] md:min-h-[380px]' 
+              : 'min-h-[420px] sm:min-h-[380px]'
           }`}
           style={{
-            minHeight: '380px',
+            minHeight: isFlipped ? '500px' : '380px',
             transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
             WebkitTransform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
             transformStyle: 'preserve-3d',
@@ -470,7 +472,7 @@ export default function DigitalStudentId({
               transform: 'rotateY(0deg)',
               WebkitTransform: 'rotateY(0deg)'
             }}
-            className={`w-full h-full rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#1b262d] border border-slate-200/80 dark:border-[#23333d] backface-hidden relative overflow-hidden flex flex-col justify-between transition-colors ${
+            className={`w-full h-full rounded-3xl p-4 sm:p-6 bg-white dark:bg-[#1b262d] border border-slate-200/80 dark:border-[#23333d] backface-hidden relative overflow-hidden flex flex-col justify-between transition-colors ${
               isFlipped ? 'pointer-events-none' : ''
             }`}
           >
@@ -481,7 +483,7 @@ export default function DigitalStudentId({
             <div className="absolute top-0 right-0 w-44 h-44 bg-gradient-to-bl from-[var(--accent-primary)]/15 via-transparent to-transparent rounded-tr-3xl pointer-events-none" />
 
             {/* Smart Chip & Action Controls accent */}
-            <div className="absolute top-6 right-6 flex items-center gap-2">
+            <div className="absolute top-4 sm:top-6 right-4 sm:right-6 flex items-center gap-1.5 sm:gap-2">
               <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-[#2e2617] border border-amber-200/70 dark:border-[#523e1c] shadow-2xs">
                 <div className="w-3.5 h-3 rounded bg-amber-400/80 dark:bg-amber-500/70 border border-amber-600/40 flex items-center justify-center">
                   <div className="w-2 h-1.5 border-t border-b border-amber-700/40" />
@@ -495,7 +497,7 @@ export default function DigitalStudentId({
               <button
                 type="button"
                 onClick={() => setIsEditModalOpen(true)}
-                className="p-2 rounded-xl bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] text-slate-500 hover:text-[var(--accent-text)] border border-slate-200/60 dark:border-[#23333d] transition-all cursor-pointer shadow-2xs group/btn"
+                className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] text-slate-500 hover:text-[var(--accent-text)] border border-slate-200/60 dark:border-[#23333d] transition-all cursor-pointer shadow-2xs group/btn"
                 title="Edit Student Profile & Credentials"
               >
                 <Edit3 className="w-4 h-4 text-[var(--accent-primary)] group-hover/btn:scale-110 transition-transform" />
@@ -505,7 +507,7 @@ export default function DigitalStudentId({
               <button
                 type="button"
                 onClick={() => setIsFlipped(true)}
-                className="p-2 rounded-xl bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] text-slate-500 hover:text-[var(--accent-text)] border border-slate-200/60 dark:border-[#23333d] transition-all cursor-pointer shadow-2xs group/btn"
+                className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] text-slate-500 hover:text-[var(--accent-text)] border border-slate-200/60 dark:border-[#23333d] transition-all cursor-pointer shadow-2xs group/btn"
                 title="Flip to view QR Code"
               >
                 <QrCode className="w-4 h-4 text-[var(--accent-primary)] group-hover/btn:scale-110 transition-transform" />
@@ -513,7 +515,7 @@ export default function DigitalStudentId({
             </div>
 
             {/* Top Branding / Institutional Row */}
-            <div className="relative z-10 flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-[#23333d]/80 pr-24 sm:pr-32">
+            <div className="relative z-10 flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-[#23333d]/80 pr-20 sm:pr-32">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-8 h-8 rounded-xl bg-[var(--accent-primary)] text-white flex items-center justify-center shadow-2xs font-bold text-xs shrink-0">
                   <GraduationCap className="w-4.5 h-4.5" />
@@ -685,7 +687,7 @@ export default function DigitalStudentId({
               backfaceVisibility: 'hidden',
               WebkitBackfaceVisibility: 'hidden'
             }}
-            className={`w-full h-full rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#1b262d] border border-slate-200/80 dark:border-[#23333d] backface-hidden rotate-y-180 absolute inset-0 flex flex-col justify-between transition-colors ${
+            className={`w-full h-full rounded-3xl p-4 sm:p-6 bg-white dark:bg-[#1b262d] border border-slate-200/80 dark:border-[#23333d] backface-hidden rotate-y-180 absolute inset-0 flex flex-col justify-between transition-colors overflow-y-auto sm:overflow-hidden ${
               !isFlipped ? 'pointer-events-none' : ''
             }`}
           >
@@ -693,7 +695,7 @@ export default function DigitalStudentId({
             <div className="absolute inset-0 bg-security-pattern pointer-events-none opacity-80" />
 
             {/* Back Header */}
-            <div className="relative z-10 flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#23333d]/80">
+            <div className="relative z-10 flex items-center justify-between pb-2.5 sm:pb-3 border-b border-slate-100 dark:border-[#23333d]/80">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-xl bg-[var(--accent-light)] text-[var(--accent-primary)] flex items-center justify-center border border-[var(--accent-light-border)]">
                   <ShieldCheck className="w-4 h-4" />
@@ -711,7 +713,7 @@ export default function DigitalStudentId({
               {/* Flip Back Button */}
               <button
                 onClick={() => setIsFlipped(false)}
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl text-xs font-semibold text-slate-600 dark:text-[#e6edf2] bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] hover:text-[var(--accent-text)] border border-slate-200/70 dark:border-[#23333d] transition-colors cursor-pointer shadow-2xs"
+                className="inline-flex items-center gap-1 px-3 py-1 min-h-[36px] rounded-xl text-xs font-semibold text-slate-600 dark:text-[#e6edf2] bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] hover:text-[var(--accent-text)] border border-slate-200/70 dark:border-[#23333d] transition-colors cursor-pointer shadow-2xs"
                 title="Flip back to front"
               >
                 <RotateCw className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
@@ -720,24 +722,24 @@ export default function DigitalStudentId({
             </div>
 
             {/* Back Body: Centered QR Code & Student Summary */}
-            <div className="relative z-10 py-2 flex flex-col sm:flex-row items-center justify-center gap-5 flex-1">
+            <div className="relative z-10 py-1.5 sm:py-2 flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-5 flex-1">
               {/* QR Code Container - Solid white background regardless of theme, ample quiet zone padding */}
-              <div className="p-3 bg-white rounded-2xl shadow-md border-2 border-slate-200 dark:border-slate-300 shrink-0">
+              <div className="p-2.5 sm:p-3 bg-white rounded-2xl shadow-md border-2 border-slate-200 dark:border-slate-300 shrink-0">
                 {qrCodeUrl ? (
                   <img
                     src={qrCodeUrl}
                     alt="Student ID QR Code"
-                    className="w-56 h-56 sm:w-60 sm:h-60 block object-contain"
+                    className="w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56 block object-contain"
                   />
                 ) : (
-                  <div className="w-56 h-56 sm:w-60 sm:h-60 flex items-center justify-center bg-white text-slate-400">
+                  <div className="w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56 flex items-center justify-center bg-white text-slate-400">
                     <QrCode className="w-10 h-10 animate-spin text-slate-500" />
                   </div>
                 )}
               </div>
 
               {/* Details & Quick Stats next to QR */}
-              <div className="text-center sm:text-left space-y-2 max-w-xs">
+              <div className="text-center sm:text-left space-y-1.5 sm:space-y-2 max-w-xs">
                 <div>
                   <h4 className="font-extrabold text-sm text-slate-900 dark:text-[#e6edf2]">
                     {studentData.name}
@@ -766,10 +768,10 @@ export default function DigitalStudentId({
                 </div>
 
                 {/* Action Controls */}
-                <div className="flex items-center gap-2 pt-1 justify-center sm:justify-start">
+                <div className="flex items-center gap-2 pt-1 justify-center sm:justify-start flex-wrap">
                   <button
                     onClick={handleShare}
-                    className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold shadow-2xs transition-all cursor-pointer ${
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 min-h-[38px] rounded-xl text-xs font-bold shadow-2xs transition-all cursor-pointer ${
                       copied || shareSuccess
                         ? 'bg-emerald-600 dark:bg-emerald-500 text-white ring-2 ring-emerald-300 dark:ring-emerald-700 animate-nav-pop'
                         : 'bg-[var(--accent-primary)] hover:opacity-90 text-white'
@@ -794,7 +796,7 @@ export default function DigitalStudentId({
                     target="_blank"
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-teal-50 dark:bg-[#13282b] hover:bg-teal-100 dark:hover:bg-[#18363a] text-teal-800 dark:text-teal-300 text-xs font-bold border border-teal-200/70 dark:border-teal-800/60 transition-colors shadow-2xs"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 min-h-[38px] rounded-xl bg-teal-50 dark:bg-[#13282b] hover:bg-teal-100 dark:hover:bg-[#18363a] text-teal-800 dark:text-teal-300 text-xs font-bold border border-teal-200/70 dark:border-teal-800/60 transition-colors shadow-2xs"
                     title="Open public-facing verification pass in new tab"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -803,7 +805,7 @@ export default function DigitalStudentId({
 
                   <button
                     onClick={handleDownloadQr}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-[#141f26] hover:bg-slate-200 dark:hover:bg-[#1e2f38] text-slate-700 dark:text-[#e6edf2] text-xs font-semibold border border-slate-200/60 dark:border-[#23333d] transition-colors cursor-pointer shadow-2xs"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 min-h-[38px] rounded-xl bg-slate-100 dark:bg-[#141f26] hover:bg-slate-200 dark:hover:bg-[#1e2f38] text-slate-700 dark:text-[#e6edf2] text-xs font-semibold border border-slate-200/60 dark:border-[#23333d] transition-colors cursor-pointer shadow-2xs"
                     title="Download QR image"
                   >
                     <Download className="w-3.5 h-3.5 text-slate-500" />

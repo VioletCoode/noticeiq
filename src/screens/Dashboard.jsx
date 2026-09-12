@@ -398,7 +398,7 @@ export default function Dashboard({
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">
+    <div className="p-3 sm:p-5 md:p-8 max-w-7xl mx-auto space-y-5 sm:space-y-6 animate-fade-in">
       
       {/* iOS PWA PROMPT BANNER */}
       {showIosBanner && !dismissIosPrompt && (
@@ -446,14 +446,13 @@ export default function Dashboard({
       )}
 
       {/* GREETING / HERO SECTION */}
-
-      <div className="bg-white dark:bg-[#1b262d] rounded-3xl p-6 md:p-8 border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden transition-colors">
+      <div className="bg-white dark:bg-[#1b262d] rounded-3xl p-4 sm:p-6 md:p-8 border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6 relative overflow-hidden transition-colors">
         {/* Left Column: Greeting + Task count + Capture Notice Pill Button */}
         <div className="space-y-3 z-10 max-w-xl">
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
             {isEditingName ? (
               <div className="flex items-center gap-2">
-                <span className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-[#e6edf2] tracking-tight">Good morning,</span>
+                <span className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-[#e6edf2] tracking-tight">Good morning,</span>
                 <input
                   type="text"
                   value={tempName}
@@ -461,18 +460,18 @@ export default function Dashboard({
                   onBlur={handleNameSave}
                   onKeyDown={(e) => e.key === 'Enter' && handleNameSave()}
                   autoFocus
-                  className="text-2xl md:text-3xl font-extrabold text-[var(--accent-text)] bg-[var(--accent-light)] border-b-2 border-[var(--accent-primary)] px-2 py-0.5 rounded-lg outline-none w-44"
+                  className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[var(--accent-text)] bg-[var(--accent-light)] border-b-2 border-[var(--accent-primary)] px-2 py-0.5 rounded-lg outline-none w-36 sm:w-44"
                 />
               </div>
             ) : (
               <h1 
                 onClick={() => setIsEditingName(true)}
-                className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-[#e6edf2] tracking-tight flex items-center gap-2 group cursor-pointer"
+                className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-[#e6edf2] tracking-tight flex items-center gap-2 group cursor-pointer"
                 title="Click to edit name"
               >
                 Good morning, <span className="text-[var(--accent-text)] underline decoration-[var(--accent-primary)] decoration-wavy underline-offset-4">{userName}</span>
-                <Sparkles className="w-5 h-5 text-[var(--accent-primary)] inline-block animate-pulse" aria-hidden="true" />
-                <Edit2 className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity ml-1" />
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--accent-primary)] inline-block animate-pulse" aria-hidden="true" />
+                <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity ml-1" />
               </h1>
             )}
 
@@ -480,9 +479,9 @@ export default function Dashboard({
               id="dashboard-play-briefing-btn"
               type="button"
               onClick={handleToggleBriefing}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-800 dark:text-[#e6edf2] text-xs font-semibold border border-slate-200/70 dark:border-white/10 shadow-2xs transition-all active:scale-95 cursor-pointer"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 min-h-[36px] rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-800 dark:text-[#e6edf2] text-xs font-semibold border border-slate-200/70 dark:border-white/10 shadow-2xs transition-all active:scale-95 cursor-pointer"
             >
-              <span>{isSpeaking ? '⏹️ Stop briefing' : '🔊 Play my briefing'}</span>
+              <span>{isSpeaking ? '⏹️ Stop briefing' : '🔊 Play briefing'}</span>
             </button>
           </div>
 
@@ -490,11 +489,11 @@ export default function Dashboard({
             You have <span className="font-bold text-slate-900 dark:text-[#e6edf2]">{attentionCount}</span> {attentionCount === 1 ? 'task' : 'tasks'} that need your attention today.
           </p>
 
-          <div className="pt-2 flex items-center gap-3">
+          <div className="pt-1 sm:pt-2 flex items-center gap-3">
             <button
               id="dashboard-capture-btn"
               onClick={onNavigateToCapture}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-sm text-white bg-[var(--accent-primary)] hover:opacity-90 shadow-2xs hover:shadow-subtle transition-all active:scale-[0.98] cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 min-h-[44px] rounded-full font-bold text-sm text-white bg-[var(--accent-primary)] hover:opacity-90 shadow-2xs hover:shadow-subtle transition-all active:scale-[0.98] cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Capture Notice</span>
@@ -502,7 +501,7 @@ export default function Dashboard({
             {onClearAllData && (
               <button
                 onClick={onClearAllData}
-                className="text-xs text-slate-400 dark:text-[#8e9fa8] hover:text-rose-600 dark:hover:text-rose-400 transition-colors font-medium hover:underline px-2 py-1 cursor-pointer"
+                className="text-xs text-slate-400 dark:text-[#8e9fa8] hover:text-rose-600 dark:hover:text-rose-400 transition-colors font-medium hover:underline px-2 py-1 cursor-pointer min-h-[44px] flex items-center"
                 title="Delete all tasks and reset state"
               >
                 Clear All Data
@@ -536,68 +535,68 @@ export default function Dashboard({
       </div>
 
       {/* STATS ROW (4 Notion-style Minimal Stat Cards with clean subtle borders) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {/* Card 1: Active Tasks */}
-        <div className="p-4 md:p-5 rounded-3xl bg-white dark:bg-[#1b262d] border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-3">
+        <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#1b262d] border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-2.5 sm:space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider">Active Tasks</span>
-            <div className="w-8 h-8 rounded-full bg-[var(--accent-badge-bg)] text-[var(--accent-badge-text)] flex items-center justify-center border border-[var(--accent-light-border)] shadow-2xs">
-              <ListTodo className="w-4 h-4" />
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider">Active Tasks</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[var(--accent-badge-bg)] text-[var(--accent-badge-text)] flex items-center justify-center border border-[var(--accent-light-border)] shadow-2xs shrink-0">
+              <ListTodo className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
           <div>
-            <div className="text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight">
+            <div className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight">
               {statsData.activeCount}
             </div>
-            <p className="text-xs text-[var(--accent-text)] font-semibold mt-0.5">Needs attention</p>
+            <p className="text-[11px] sm:text-xs text-[var(--accent-text)] font-semibold mt-0.5">Needs attention</p>
           </div>
         </div>
 
         {/* Card 2: Documents Ready */}
-        <div className="p-4 md:p-5 rounded-3xl bg-white dark:bg-[#1b262d] border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-3">
+        <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#1b262d] border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-2.5 sm:space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider">Documents Ready</span>
-            <div className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-[#142922] text-emerald-700 dark:text-emerald-300 flex items-center justify-center border border-emerald-200/60 dark:border-[#1c483a] shadow-2xs">
-              <ShieldCheck className="w-4 h-4" />
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider">Docs Ready</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-50 dark:bg-[#142922] text-emerald-700 dark:text-emerald-300 flex items-center justify-center border border-emerald-200/60 dark:border-[#1c483a] shadow-2xs shrink-0">
+              <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
           <div>
-            <div className="text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight">
+            <div className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight">
               {statsData.readyRatio}
             </div>
-            <p className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5">{statsData.readyLabel}</p>
+            <p className="text-[11px] sm:text-xs text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5">{statsData.readyLabel}</p>
           </div>
         </div>
 
         {/* Card 3: AI Extracted This Week */}
-        <div className="p-4 md:p-5 rounded-3xl bg-white dark:bg-[#1b262d] border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-3">
+        <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#1b262d] border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-2.5 sm:space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider">This Week</span>
-            <div className="w-8 h-8 rounded-full bg-[var(--accent-badge-bg)] text-[var(--accent-badge-text)] flex items-center justify-center border border-[var(--accent-light-border)] shadow-2xs">
-              <Sparkles className="w-4 h-4" />
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider">This Week</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[var(--accent-badge-bg)] text-[var(--accent-badge-text)] flex items-center justify-center border border-[var(--accent-light-border)] shadow-2xs shrink-0">
+              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
           <div>
-            <div className="text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight">
+            <div className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight">
               {statsData.extractedThisWeekCount}
             </div>
-            <p className="text-xs text-[var(--accent-text)] font-semibold mt-0.5">AI Extracted</p>
+            <p className="text-[11px] sm:text-xs text-[var(--accent-text)] font-semibold mt-0.5">AI Extracted</p>
           </div>
         </div>
 
         {/* Card 4: Sync Accuracy */}
-        <div className="p-4 md:p-5 rounded-3xl bg-white dark:bg-[#1b262d] border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-3">
+        <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#1b262d] border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-2.5 sm:space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider">Accuracy</span>
-            <div className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-[#142922] text-emerald-700 dark:text-emerald-300 flex items-center justify-center border border-emerald-200/60 dark:border-[#1c483a] shadow-2xs">
-              <Activity className="w-4 h-4" />
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider">Accuracy</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-50 dark:bg-[#142922] text-emerald-700 dark:text-emerald-300 flex items-center justify-center border border-emerald-200/60 dark:border-[#1c483a] shadow-2xs shrink-0">
+              <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
           <div>
-            <div className="text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight">
+            <div className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight">
               {statsData.syncAccuracy}
             </div>
-            <p className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5">Cross-verified</p>
+            <p className="text-[11px] sm:text-xs text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5">Cross-verified</p>
           </div>
         </div>
       </div>
@@ -912,7 +911,7 @@ export default function Dashboard({
                   id="dashboard-connect-gmail-btn"
                   type="button"
                   onClick={handleConnectGmail}
-                  className="w-full py-2.5 px-4 rounded-xl bg-[var(--accent-primary)] hover:opacity-90 text-white font-bold text-xs transition-all shadow-2xs active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-2.5 px-4 min-h-[44px] rounded-xl bg-[var(--accent-primary)] hover:opacity-90 text-white font-bold text-xs transition-all shadow-2xs active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Mail className="w-3.5 h-3.5" />
                   <span>Connect Gmail</span>
@@ -924,7 +923,7 @@ export default function Dashboard({
                     type="button"
                     onClick={handleManualSync}
                     disabled={isSyncingGmail}
-                    className="flex-1 py-2.5 px-4 rounded-xl bg-[var(--accent-primary)] hover:opacity-90 text-white font-bold text-xs transition-all shadow-2xs active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+                    className="flex-1 py-2.5 px-4 min-h-[44px] rounded-xl bg-[var(--accent-primary)] hover:opacity-90 text-white font-bold text-xs transition-all shadow-2xs active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isSyncingGmail ? 'animate-spin' : ''}`} />
                     <span>{isSyncingGmail ? 'Scanning...' : 'Sync Now'}</span>
@@ -934,7 +933,7 @@ export default function Dashboard({
                     onClick={handleDisconnectGmail}
                     disabled={isSyncingGmail}
                     title="Disconnect Gmail"
-                    className="py-2.5 px-3 rounded-xl border border-slate-200 dark:border-[#23333d] hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-300 text-xs font-semibold transition-all cursor-pointer"
+                    className="py-2.5 px-3 min-h-[44px] rounded-xl border border-slate-200 dark:border-[#23333d] hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-300 text-xs font-semibold transition-all cursor-pointer"
                   >
                     Disconnect
                   </button>
@@ -960,7 +959,7 @@ export default function Dashboard({
                 type="button"
                 onClick={handleToggleAlerts}
                 disabled={isRegisteringAlerts}
-                className="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-slate-50 text-slate-900 font-bold text-xs transition-all shadow-2xs active:scale-[0.98] flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-75"
+                className="w-full py-2.5 px-4 min-h-[44px] rounded-xl bg-white hover:bg-slate-50 text-slate-900 font-bold text-xs transition-all shadow-2xs active:scale-[0.98] flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-75"
               >
                 {isRegisteringAlerts ? (
                   <>

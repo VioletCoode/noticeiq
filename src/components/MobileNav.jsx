@@ -52,7 +52,7 @@ export default function MobileNav({
                   setActiveTab('analytics');
                   setIsMoreOpen(false);
                 }}
-                className="flex items-center gap-3 p-3 rounded-2xl hover:bg-[var(--accent-light)] text-slate-700 dark:text-[#e6edf2] font-semibold transition-colors cursor-pointer"
+                className="flex items-center gap-3 p-3 min-h-[44px] rounded-2xl hover:bg-[var(--accent-light)] text-slate-700 dark:text-[#e6edf2] font-semibold transition-colors cursor-pointer"
               >
                 <BarChart3 className="w-4 h-4 text-[var(--accent-primary)]" />
                 <span>Analytics & Insights</span>
@@ -63,7 +63,7 @@ export default function MobileNav({
                   setIsMoreOpen(false);
                   if (onOpenApiKeyModal) onOpenApiKeyModal();
                 }}
-                className="flex items-center gap-3 p-3 rounded-2xl hover:bg-[var(--accent-light)] text-slate-700 dark:text-[#e6edf2] font-semibold transition-colors cursor-pointer"
+                className="flex items-center gap-3 p-3 min-h-[44px] rounded-2xl hover:bg-[var(--accent-light)] text-slate-700 dark:text-[#e6edf2] font-semibold transition-colors cursor-pointer"
               >
                 <Key className="w-4 h-4 text-[var(--accent-primary)]" />
                 <span>Gemini API Key Settings</span>
@@ -75,7 +75,7 @@ export default function MobileNav({
                     setIsMoreOpen(false);
                     onClearAllData();
                   }}
-                  className="flex items-center gap-3 p-3 rounded-2xl hover:bg-rose-50 dark:hover:bg-[#2b191e] text-rose-600 dark:text-rose-400 font-semibold transition-colors cursor-pointer"
+                  className="flex items-center gap-3 p-3 min-h-[44px] rounded-2xl hover:bg-rose-50 dark:hover:bg-[#2b191e] text-rose-600 dark:text-rose-400 font-semibold transition-colors cursor-pointer"
                 >
                   <Trash2 className="w-4 h-4" />
                   <span>Clear All Data</span>
@@ -87,7 +87,7 @@ export default function MobileNav({
       )}
 
       {/* Bottom Sticky Tab Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 dark:bg-[#152026]/95 backdrop-blur-md border-t border-slate-200/60 dark:border-[#1e2d36]/70 z-40 px-3 flex items-center justify-around shadow-sm transition-colors">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 dark:bg-[#152026]/95 backdrop-blur-md border-t border-slate-200/60 dark:border-[#1e2d36]/70 z-40 px-2 sm:px-3 flex items-center justify-around shadow-sm transition-colors">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -95,7 +95,7 @@ export default function MobileNav({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center justify-center flex-1 py-1 relative transition-colors cursor-pointer ${
+              className={`flex flex-col items-center justify-center flex-1 py-1 min-h-[44px] min-w-[44px] relative transition-colors cursor-pointer ${
                 isActive ? 'text-[var(--accent-text)] font-bold' : 'text-slate-500 dark:text-[#8e9fa8] hover:text-slate-800 dark:hover:text-[#e6edf2]'
               }`}
             >
@@ -115,7 +115,7 @@ export default function MobileNav({
         {/* More Button */}
         <button
           onClick={() => setIsMoreOpen(true)}
-          className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors cursor-pointer ${
+          className={`flex flex-col items-center justify-center flex-1 py-1 min-h-[44px] min-w-[44px] transition-colors cursor-pointer ${
             activeTab === 'analytics' ? 'text-[var(--accent-text)] font-bold' : 'text-slate-500 dark:text-[#8e9fa8] hover:text-slate-800 dark:hover:text-[#e6edf2]'
           }`}
         >

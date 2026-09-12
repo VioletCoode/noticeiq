@@ -482,16 +482,16 @@ export default function EditProfileModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/60 backdrop-blur-xs animate-fade-in"
       role="dialog"
       aria-modal="true"
     >
-      <div className="bg-white dark:bg-[#1b262d] rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200/70 dark:border-[#23333d] relative space-y-4 animate-popover origin-center max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-[#1b262d] rounded-3xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl border border-slate-200/70 dark:border-[#23333d] relative space-y-4 animate-popover origin-center max-h-[92vh] overflow-y-auto">
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-[#e6edf2] rounded-xl hover:bg-slate-100 dark:hover:bg-[#141f26] transition-colors cursor-pointer"
+          className="absolute top-3.5 sm:top-4 right-3.5 sm:right-4 p-2 min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-[#e6edf2] rounded-xl hover:bg-slate-100 dark:hover:bg-[#141f26] transition-colors cursor-pointer"
           aria-label="Close edit profile modal"
         >
           <X className="w-5 h-5" />
@@ -1289,18 +1289,18 @@ export default function EditProfileModal({
           </SectionAccordion>
 
           {/* Modal Footer Controls */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-[#23333d]">
+          <div className="flex items-center justify-end gap-2.5 sm:gap-3 pt-3 border-t border-slate-100 dark:border-[#23333d]">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-[#8e9fa8] hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-[#141f26] transition-colors cursor-pointer"
+              className="px-4 py-2 min-h-[44px] text-xs font-semibold text-slate-600 dark:text-[#8e9fa8] hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-[#141f26] transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold text-white bg-[var(--accent-primary)] hover:opacity-90 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-5 py-2 min-h-[44px] rounded-xl text-xs font-bold text-white bg-[var(--accent-primary)] hover:opacity-90 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
             >
               {isSaving ? (
                 <>

@@ -64,7 +64,7 @@ export default function Sidebar({
   const sessionReqCount = getSessionRequestCount();
 
   return (
-    <aside className="w-72 bg-[var(--bg-sidebar)] border-r border-[var(--border-sidebar)] flex flex-col justify-between h-[calc(100vh-4rem)] md:h-screen sticky top-0 shadow-sm select-none z-30 overflow-x-hidden overflow-y-auto text-white transition-colors">
+    <aside className="w-60 lg:w-64 xl:w-72 bg-[var(--bg-sidebar)] border-r border-[var(--border-sidebar)] flex flex-col justify-between h-[calc(100vh-4rem)] md:h-screen sticky top-0 shadow-sm select-none z-30 overflow-x-hidden overflow-y-auto text-white transition-all">
       {/* Navigation Workspace */}
       <div className="pt-4 pb-3 pl-3 pr-0 space-y-1.5 relative">
         <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white/50 dark:text-[#8e9fa8]">
@@ -78,9 +78,9 @@ export default function Sidebar({
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               style={isActive ? { backgroundColor: 'var(--bg-page)' } : {}}
-              className={`flex items-center justify-between text-xs transition-all duration-180 ease-in-out group cursor-pointer ${
+              className={`flex items-center justify-between text-xs min-h-[44px] transition-all duration-180 ease-in-out group cursor-pointer ${
                 isActive
-                  ? 'w-[calc(100%+1px)] mr-[-1px] rounded-l-2xl rounded-r-none pl-4 pr-3.5 py-3.5 bg-[var(--bg-page)] text-slate-900 dark:text-[#e6edf2] font-black animate-nav-pop z-30 relative shadow-[-4px_0_12px_rgba(0,0,0,0.06)] dark:shadow-[-4px_0_16px_rgba(0,0,0,0.35)] border-y border-l border-slate-200/60 dark:border-[#23333d]/70 border-r-0'
+                  ? 'w-[calc(100%+1px)] mr-[-1px] rounded-l-2xl rounded-r-none pl-3.5 sm:pl-4 pr-3 py-3 bg-[var(--bg-page)] text-slate-900 dark:text-[#e6edf2] font-black animate-nav-pop z-30 relative shadow-[-4px_0_12px_rgba(0,0,0,0.06)] dark:shadow-[-4px_0_16px_rgba(0,0,0,0.35)] border-y border-l border-slate-200/60 dark:border-[#23333d]/70 border-r-0'
                   : 'w-[calc(100%-0.75rem)] mr-3 px-3.5 py-2.5 rounded-2xl text-white/80 dark:text-slate-300/80 hover:bg-white/[0.08] dark:hover:bg-white/[0.05] hover:text-white font-medium hover:translate-x-0.5'
               }`}
             >

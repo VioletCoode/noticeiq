@@ -95,7 +95,7 @@ export default function TaskCard({
 
   return (
     <div
-      className={`group rounded-3xl p-5 md:p-6 border transition-all duration-180 relative overflow-hidden flex flex-col sm:flex-row items-start gap-4 sm:gap-5 ${
+      className={`group rounded-3xl p-4 sm:p-5 md:p-6 border transition-all duration-180 relative overflow-hidden flex flex-col sm:flex-row items-start gap-3.5 sm:gap-5 ${
         completed 
           ? 'border-slate-200/60 dark:border-[#23333d]/60 bg-slate-50/70 dark:bg-[#141f26]/50 opacity-60' 
           : currentPriority.cardClass
@@ -115,7 +115,7 @@ export default function TaskCard({
       <div className="flex-1 min-w-0 w-full space-y-2.5">
         {/* Top Badges Row + Action Controls */}
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
             {/* Priority Badge with circular icon */}
             <div
               className={`inline-flex items-center gap-1.5 pl-1.5 pr-2.5 py-0.5 rounded-full text-[11px] font-bold border tracking-wide shadow-2xs ${currentPriority.badgeClass}`}
@@ -152,7 +152,7 @@ export default function TaskCard({
             <button
               onClick={() => onToggleComplete(id)}
               title={completed ? 'Mark task as active' : 'Mark task as done'}
-              className="p-1.5 text-slate-400 hover:text-[var(--accent-text)] hover:bg-[var(--accent-light)] rounded-xl transition-colors cursor-pointer"
+              className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-[var(--accent-text)] hover:bg-[var(--accent-light)] rounded-xl transition-colors cursor-pointer"
             >
               {completed ? (
                 <CheckCircle2 className="w-5 h-5 text-[var(--accent-primary)] fill-[var(--accent-light)]" />
@@ -165,7 +165,7 @@ export default function TaskCard({
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#141f26] rounded-xl transition-colors cursor-pointer"
+                className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#141f26] rounded-xl transition-colors cursor-pointer"
                 title="More options"
               >
                 <MoreVertical className="w-4 h-4" />
@@ -178,7 +178,7 @@ export default function TaskCard({
                       setIsMenuOpen(false);
                       onDelete(id);
                     }}
-                    className="w-full text-left px-3 py-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 flex items-center gap-2 font-medium cursor-pointer"
+                    className="w-full text-left px-3 py-2 min-h-[40px] text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 flex items-center gap-2 font-medium cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Delete</span>

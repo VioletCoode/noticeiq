@@ -266,7 +266,7 @@ export default function CampusVault({
   const linkedProfilesCount = profiles.filter((p) => Boolean(p.url)).length;
 
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-8 animate-fade-in">
+    <div className="p-3 sm:p-6 md:p-8 max-w-5xl mx-auto space-y-6 sm:space-y-8 animate-fade-in">
       {/* Hidden Document File Picker */}
       <input 
         type="file" 
@@ -277,14 +277,14 @@ export default function CampusVault({
       />
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200/60 dark:border-[#23333d]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 sm:pb-6 border-b border-slate-200/60 dark:border-[#23333d]">
         <div>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[var(--accent-light)] text-[var(--accent-primary)] flex items-center justify-center shadow-2xs border border-[var(--accent-light-border)]">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-10 h-10 rounded-full bg-[var(--accent-light)] text-[var(--accent-primary)] flex items-center justify-center shadow-2xs border border-[var(--accent-light-border)] shrink-0">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold text-slate-900 dark:text-[#e6edf2] tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-[#e6edf2] tracking-tight">
                 Campus Vault
               </h1>
               <p className="text-xs text-slate-500 dark:text-[#8e9fa8] font-medium">
@@ -302,7 +302,7 @@ export default function CampusVault({
       </div>
 
       {/* Info Banner */}
-      <div className="p-5 rounded-3xl bg-[var(--accent-light)] border border-[var(--accent-light-border)] flex items-start gap-3.5 shadow-2xs">
+      <div className="p-4 sm:p-5 rounded-3xl bg-[var(--accent-light)] border border-[var(--accent-light-border)] flex items-start gap-3.5 shadow-2xs">
         <Sparkles className="w-5 h-5 text-[var(--accent-primary)] shrink-0 mt-0.5" />
         <div className="text-xs space-y-1">
           <p className="font-bold text-slate-900 dark:text-[#e6edf2]">
@@ -336,11 +336,11 @@ export default function CampusVault({
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="text-xs font-bold px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-[#23333d] bg-white dark:bg-[#1b262d] text-slate-700 dark:text-[#e6edf2] outline-none"
+              className="text-xs font-bold px-2.5 py-2 min-h-[40px] rounded-xl border border-slate-200 dark:border-[#23333d] bg-white dark:bg-[#1b262d] text-slate-700 dark:text-[#e6edf2] outline-none cursor-pointer"
             >
               <option value="Identification">Identification</option>
               <option value="Finance">Finance</option>
@@ -353,7 +353,7 @@ export default function CampusVault({
               type="button"
               disabled={isUploading}
               onClick={() => docInputRef.current?.click()}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-[var(--accent-primary)] hover:opacity-90 transition-all shadow-2xs cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-4 py-2 min-h-[40px] rounded-xl text-xs font-bold text-white bg-[var(--accent-primary)] hover:opacity-90 transition-all shadow-2xs cursor-pointer disabled:opacity-50"
             >
               {isUploading ? (
                 <>

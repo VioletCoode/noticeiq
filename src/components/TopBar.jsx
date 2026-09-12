@@ -89,9 +89,9 @@ export default function TopBar({
   const isDark = theme === 'dark';
 
   return (
-    <header className="h-16 bg-white/95 dark:bg-[#152026]/95 backdrop-blur-md border-b border-slate-200/60 dark:border-[#1e2d36]/70 sticky top-0 z-40 px-4 md:px-8 flex items-center justify-between shadow-2xs rounded-b-2xl md:rounded-b-3xl transition-colors">
+    <header className="h-16 bg-white/95 dark:bg-[#152026]/95 backdrop-blur-md border-b border-slate-200/60 dark:border-[#1e2d36]/70 sticky top-0 z-40 px-2.5 sm:px-4 md:px-8 flex items-center justify-between shadow-2xs rounded-b-2xl md:rounded-b-3xl transition-colors">
       {/* Far Left: Brand / Logo */}
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         <div className="w-9 h-9 rounded-xl bg-[var(--accent-primary)] flex items-center justify-center text-white shadow-2xs">
           <GraduationCap className="w-5 h-5" aria-hidden="true" />
         </div>
@@ -104,14 +104,14 @@ export default function TopBar({
       </div>
 
       {/* Centered: Search Input Trigger Button (Opens Popup Search Modal) */}
-      <div className="flex-1 max-w-md mx-4 md:mx-8">
+      <div className="flex-1 max-w-md mx-2 sm:mx-4 md:mx-8">
         <button
           id="topbar-search-trigger-btn"
           type="button"
           onClick={() => {
             if (onOpenSearch) onOpenSearch();
           }}
-          className="w-full flex items-center justify-between px-3.5 sm:px-4 py-2 rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/70 dark:hover:bg-[#23333d] border border-slate-200/60 dark:border-[#23333d]/80 text-xs sm:text-sm text-slate-500 dark:text-[#8e9fa8] transition-all group shadow-2xs cursor-pointer text-left"
+          className="w-full flex items-center justify-between px-3 sm:px-4 py-2 min-h-[40px] rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/70 dark:hover:bg-[#23333d] border border-slate-200/60 dark:border-[#23333d]/80 text-xs sm:text-sm text-slate-500 dark:text-[#8e9fa8] transition-all group shadow-2xs cursor-pointer text-left"
           title="Search notices, documents, and tasks (Ctrl + /)"
           aria-label="Open search popup"
         >
@@ -183,7 +183,7 @@ export default function TopBar({
 
           {/* Notification dropdown popover */}
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-[#1b262d] rounded-2xl p-4 shadow-xl border border-slate-200/70 dark:border-[#23333d] z-50 text-xs space-y-2.5 animate-popover origin-top-right">
+            <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-1.5rem)] bg-white dark:bg-[#1b262d] rounded-2xl p-4 shadow-xl border border-slate-200/70 dark:border-[#23333d] z-50 text-xs space-y-2.5 animate-popover origin-top-right">
               <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-[#23333d] font-bold text-slate-800 dark:text-[#e6edf2]">
                 <span>Notifications</span>
                 {notifications.length > 0 ? (
@@ -235,7 +235,7 @@ export default function TopBar({
             id="profile-menu-btn"
             type="button"
             onClick={() => setIsProfileOpen(!isProfileOpen)}
-            className="flex items-center gap-2.5 pl-1.5 pr-3 py-1 rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/80 dark:hover:bg-[#23333d] border border-slate-200/60 dark:border-[#23333d] transition-all group cursor-pointer"
+            className="flex items-center gap-2 pl-1.5 pr-2.5 sm:pr-3 py-1 min-h-[38px] rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/80 dark:hover:bg-[#23333d] border border-slate-200/60 dark:border-[#23333d] transition-all group cursor-pointer"
             aria-label="Open profile settings"
           >
             <div className="w-7 h-7 rounded-full bg-[var(--accent-primary)] text-white flex items-center justify-center font-bold text-xs shadow-2xs">
@@ -252,7 +252,7 @@ export default function TopBar({
 
           {/* Profile Dropdown Menu */}
           {isProfileOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#1b262d] rounded-2xl p-3 shadow-xl border border-slate-200/70 dark:border-[#23333d] z-50 text-xs space-y-2 animate-popover origin-top-right">
+            <div className="absolute right-0 mt-2 w-56 max-w-[calc(100vw-1.5rem)] bg-white dark:bg-[#1b262d] rounded-2xl p-3 shadow-xl border border-slate-200/70 dark:border-[#23333d] z-50 text-xs space-y-2 animate-popover origin-top-right">
               <div className="p-2 border-b border-slate-100 dark:border-[#23333d]">
                 {isEditingName ? (
                   <div className="flex items-center gap-1.5">

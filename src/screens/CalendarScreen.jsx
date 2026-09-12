@@ -159,16 +159,16 @@ export default function CalendarScreen({ tasks = [], onNavigateToCapture }) {
   }, [selectedDay, sortedUpcomingTasks, currentYear, currentMonthIndex]);
 
   return (
-    <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in relative">
+    <div className="p-3 sm:p-6 md:p-8 max-w-6xl mx-auto space-y-5 sm:space-y-6 animate-fade-in relative">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200/60 dark:border-[#23333d]">
         <div>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[var(--accent-light)] text-[var(--accent-primary)] flex items-center justify-center shadow-2xs border border-[var(--accent-light-border)]">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-10 h-10 rounded-full bg-[var(--accent-light)] text-[var(--accent-primary)] flex items-center justify-center shadow-2xs border border-[var(--accent-light-border)] shrink-0">
               <CalendarIcon className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold text-slate-900 dark:text-[#e6edf2] tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-[#e6edf2] tracking-tight">
                 Academic Calendar & Deadlines
               </h1>
               <p className="text-xs text-slate-500 dark:text-[#8e9fa8] font-medium">
@@ -186,7 +186,7 @@ export default function CalendarScreen({ tasks = [], onNavigateToCapture }) {
       </div>
 
       {/* Main Grid: Calendar Strip + Deadlines List */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
         
         {/* Calendar View Container with Soft Ambient Glow in Dark Mode (8 Cols) */}
         <div className="lg:col-span-8 relative">
@@ -198,10 +198,10 @@ export default function CalendarScreen({ tasks = [], onNavigateToCapture }) {
           />
 
           {/* Calendar Card */}
-          <div className="bg-white dark:bg-[#1b262d]/95 backdrop-blur-xs rounded-3xl p-6 border border-slate-200/60 dark:border-[#23333d]/90 dark:shadow-[0_0_40px_-15px_rgba(20,184,166,0.15)] shadow-2xs space-y-4 relative z-10 transition-all">
+          <div className="bg-white dark:bg-[#1b262d]/95 backdrop-blur-xs rounded-3xl p-3.5 sm:p-6 border border-slate-200/60 dark:border-[#23333d]/90 dark:shadow-[0_0_40px_-15px_rgba(20,184,166,0.15)] shadow-2xs space-y-4 relative z-10 transition-all">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-slate-900 dark:text-[#e6edf2]">
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-[#e6edf2]">
                   {MONTH_NAMES[currentMonthIndex]} {currentYear}
                 </h2>
                 {isCurrentMonth ? (
@@ -218,11 +218,11 @@ export default function CalendarScreen({ tasks = [], onNavigateToCapture }) {
                   </button>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <button
                   type="button"
                   onClick={handlePrevMonth}
-                  className="p-1.5 rounded-xl border border-slate-200/80 dark:border-[#23333d] hover:bg-slate-50 dark:hover:bg-[#141f26] text-slate-600 dark:text-[#8e9fa8] transition-colors cursor-pointer"
+                  className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl border border-slate-200/80 dark:border-[#23333d] hover:bg-slate-50 dark:hover:bg-[#141f26] text-slate-600 dark:text-[#8e9fa8] transition-colors cursor-pointer"
                   aria-label="Previous month"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -230,7 +230,7 @@ export default function CalendarScreen({ tasks = [], onNavigateToCapture }) {
                 <button
                   type="button"
                   onClick={handleNextMonth}
-                  className="p-1.5 rounded-xl border border-slate-200/80 dark:border-[#23333d] hover:bg-slate-50 dark:hover:bg-[#141f26] text-slate-600 dark:text-[#8e9fa8] transition-colors cursor-pointer"
+                  className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl border border-slate-200/80 dark:border-[#23333d] hover:bg-slate-50 dark:hover:bg-[#141f26] text-slate-600 dark:text-[#8e9fa8] transition-colors cursor-pointer"
                   aria-label="Next month"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -239,9 +239,9 @@ export default function CalendarScreen({ tasks = [], onNavigateToCapture }) {
             </div>
 
             {/* Calendar Grid Representation */}
-            <div className="grid grid-cols-7 gap-2 text-center text-xs">
+            <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center text-xs">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-                <div key={d} className="font-bold text-slate-400 dark:text-[#8e9fa8] py-1.5">
+                <div key={d} className="font-bold text-[10px] sm:text-xs text-slate-400 dark:text-[#8e9fa8] py-1">
                   {d}
                 </div>
               ))}
@@ -250,9 +250,9 @@ export default function CalendarScreen({ tasks = [], onNavigateToCapture }) {
               {prevMonthDays.map((pDay) => (
                 <div
                   key={`prev-${pDay}`}
-                  className="min-h-[58px] p-1.5 rounded-2xl border border-dashed border-slate-100 dark:border-[#1e2a32]/40 bg-slate-50/20 dark:bg-[#111c22]/20 text-slate-300 dark:text-slate-600 flex flex-col items-center justify-between select-none opacity-40 cursor-default"
+                  className="min-h-[44px] sm:min-h-[58px] p-1 sm:p-1.5 rounded-xl sm:rounded-2xl border border-dashed border-slate-100 dark:border-[#1e2a32]/40 bg-slate-50/20 dark:bg-[#111c22]/20 text-slate-300 dark:text-slate-600 flex flex-col items-center justify-between select-none opacity-40 cursor-default"
                 >
-                  <span className="text-[11px] font-medium">{pDay}</span>
+                  <span className="text-[10px] sm:text-[11px] font-medium">{pDay}</span>
                 </div>
               ))}
 
@@ -275,7 +275,7 @@ export default function CalendarScreen({ tasks = [], onNavigateToCapture }) {
                         ? 'Today'
                         : undefined
                     }
-                    className={`min-h-[58px] p-1.5 rounded-2xl border flex flex-col items-center justify-between transition-all relative text-center cursor-pointer ${
+                    className={`min-h-[44px] sm:min-h-[58px] p-1 sm:p-1.5 rounded-xl sm:rounded-2xl border flex flex-col items-center justify-between transition-all relative text-center cursor-pointer ${
                       isSelected
                         ? 'ring-2 ring-[var(--accent-primary)] ring-offset-2 dark:ring-offset-[#1b262d] z-20'
                         : ''
@@ -289,7 +289,7 @@ export default function CalendarScreen({ tasks = [], onNavigateToCapture }) {
                   >
                     {hasTask ? (
                       <span
-                        className={`w-6 h-6 rounded-full bg-[var(--accent-primary)] text-white font-bold flex items-center justify-center text-[11px] shadow-2xs ${
+                        className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[var(--accent-primary)] text-white font-bold flex items-center justify-center text-[10px] sm:text-[11px] shadow-2xs ${
                           isToday
                             ? 'dark:shadow-[0_0_16px_rgba(20,184,166,0.9),0_0_5px_rgba(94,234,212,1)] ring-1.5 ring-teal-300 dark:ring-teal-400'
                             : 'dark:shadow-[0_0_10px_rgba(20,184,166,0.7),0_0_3px_rgba(45,212,191,0.8)]'
@@ -298,19 +298,19 @@ export default function CalendarScreen({ tasks = [], onNavigateToCapture }) {
                         {day}
                       </span>
                     ) : isToday ? (
-                      <span className="w-6 h-6 rounded-full bg-slate-200 dark:bg-[#1f333b] text-teal-800 dark:text-teal-300 font-bold flex items-center justify-center text-[11px] dark:shadow-[0_0_8px_rgba(20,184,166,0.3)]">
+                      <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-200 dark:bg-[#1f333b] text-teal-800 dark:text-teal-300 font-bold flex items-center justify-center text-[10px] sm:text-[11px] dark:shadow-[0_0_8px_rgba(20,184,166,0.3)]">
                         {day}
                       </span>
                     ) : (
-                      <span className="text-[11px] font-semibold">{day}</span>
+                      <span className="text-[10px] sm:text-[11px] font-semibold">{day}</span>
                     )}
 
                     {hasTask ? (
-                      <span className="text-[9px] font-bold text-[var(--accent-text)] dark:text-teal-300 truncate max-w-full px-1">
+                      <span className="text-[8px] sm:text-[9px] font-bold text-[var(--accent-text)] dark:text-teal-300 truncate max-w-full px-0.5">
                         {dayTasks.length > 1 ? `${dayTasks.length} Notices` : (dayTasks[0].category || 'Notice')}
                       </span>
                     ) : isToday ? (
-                      <span className="text-[9px] font-semibold text-slate-400 dark:text-teal-400/80 truncate max-w-full">
+                      <span className="text-[8px] sm:text-[9px] font-semibold text-slate-400 dark:text-teal-400/80 truncate max-w-full">
                         Today
                       </span>
                     ) : null}
@@ -322,9 +322,9 @@ export default function CalendarScreen({ tasks = [], onNavigateToCapture }) {
               {nextMonthDays.map((nDay) => (
                 <div
                   key={`next-${nDay}`}
-                  className="min-h-[58px] p-1.5 rounded-2xl border border-dashed border-slate-100 dark:border-[#1e2a32]/40 bg-slate-50/20 dark:bg-[#111c22]/20 text-slate-300 dark:text-slate-600 flex flex-col items-center justify-between select-none opacity-40 cursor-default"
+                  className="min-h-[44px] sm:min-h-[58px] p-1 sm:p-1.5 rounded-xl sm:rounded-2xl border border-dashed border-slate-100 dark:border-[#1e2a32]/40 bg-slate-50/20 dark:bg-[#111c22]/20 text-slate-300 dark:text-slate-600 flex flex-col items-center justify-between select-none opacity-40 cursor-default"
                 >
-                  <span className="text-[11px] font-medium">{nDay}</span>
+                  <span className="text-[10px] sm:text-[11px] font-medium">{nDay}</span>
                 </div>
               ))}
             </div>
@@ -332,7 +332,7 @@ export default function CalendarScreen({ tasks = [], onNavigateToCapture }) {
         </div>
 
         {/* Upcoming Notice Deadlines (4 Cols) */}
-        <div className="lg:col-span-4 bg-white dark:bg-[#1b262d] rounded-3xl p-6 border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs space-y-4">
+        <div className="lg:col-span-4 bg-white dark:bg-[#1b262d] rounded-3xl p-4 sm:p-6 border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#23333d]">
             <div>
               <h3 className="font-bold text-slate-900 dark:text-[#e6edf2] text-sm">Upcoming Deadlines</h3>

@@ -304,7 +304,7 @@ export default function Capture({ onTaskCreated, onCancel }) {
   };
 
   return (
-    <div className="p-4 sm:p-8 max-w-4xl mx-auto space-y-8 animate-fade-in">
+    <div className="p-3 sm:p-6 md:p-8 max-w-4xl mx-auto space-y-6 sm:space-y-8 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between pb-4 border-b border-slate-200/60 dark:border-[#23333d]">
         <div>
@@ -312,25 +312,25 @@ export default function Capture({ onTaskCreated, onCancel }) {
             <span className="p-2 rounded-xl bg-[var(--accent-light)] text-[var(--accent-primary)] border border-[var(--accent-light-border)]">
               <Sparkles className="w-5 h-5" />
             </span>
-            <h1 className="text-2xl font-extrabold text-slate-900 dark:text-[#e6edf2] tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-[#e6edf2] tracking-tight">
               Capture & Extract Notice
             </h1>
           </div>
-          <p className="text-sm text-slate-500 dark:text-[#8e9fa8] mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-[#8e9fa8] mt-1">
             Upload a screenshot, attach a PDF circular, or paste raw text. Gemini AI organizes everything automatically.
           </p>
         </div>
 
         <button
           onClick={onCancel}
-          className="text-xs font-semibold text-slate-500 dark:text-[#8e9fa8] hover:text-slate-800 dark:hover:text-[#e6edf2] px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#141f26] transition-colors cursor-pointer"
+          className="text-xs font-semibold text-slate-500 dark:text-[#8e9fa8] hover:text-slate-800 dark:hover:text-[#e6edf2] px-3 py-2 min-h-[40px] rounded-xl hover:bg-slate-100 dark:hover:bg-[#141f26] transition-colors cursor-pointer"
         >
           Cancel & Back
         </button>
       </div>
 
       {/* Main Form & Presets Card */}
-      <div className="bg-white dark:bg-[#1b262d] rounded-3xl p-6 border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs space-y-6">
+      <div className="bg-white dark:bg-[#1b262d] rounded-3xl p-4 sm:p-6 border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs space-y-5 sm:space-y-6">
         
         {/* Sample Notice Quick Pickers */}
         <div className="space-y-2.5">

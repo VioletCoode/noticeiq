@@ -66,17 +66,17 @@ export default function SearchModal({
   return (
     <div
       onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-slate-950/60 backdrop-blur-xs animate-fade-in"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-10 sm:pt-20 px-2.5 sm:px-4 bg-slate-950/60 backdrop-blur-xs animate-fade-in"
       role="dialog"
       aria-modal="true"
       aria-labelledby="search-modal-title"
     >
-      <div className="bg-white dark:bg-[#1b262d] rounded-3xl max-w-2xl w-full p-5 shadow-2xl border border-slate-200/70 dark:border-[#23333d] relative space-y-4 overflow-hidden animate-popover origin-top">
+      <div className="bg-white dark:bg-[#1b262d] rounded-3xl max-w-2xl w-full p-4 sm:p-5 shadow-2xl border border-slate-200/70 dark:border-[#23333d] relative space-y-4 overflow-hidden animate-popover origin-top max-h-[88vh] flex flex-col">
         
         {/* Search Bar Input Header */}
         <div className="relative flex items-center">
-          <div className="absolute left-4 text-[var(--accent-primary)] pointer-events-none flex items-center justify-center">
-            <Search className="w-5 h-5" />
+          <div className="absolute left-3.5 sm:left-4 text-[var(--accent-primary)] pointer-events-none flex items-center justify-center">
+            <Search className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <input
             ref={inputRef}
@@ -84,15 +84,15 @@ export default function SearchModal({
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search notices, action items, documents, deadlines..."
-            className="w-full pl-12 pr-24 py-3.5 rounded-2xl bg-slate-100/80 dark:bg-[#141f26] border border-slate-200/80 dark:border-[#23333d] focus:bg-white dark:focus:bg-[#152026] focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-ring)] text-sm text-slate-900 dark:text-[#e6edf2] placeholder-slate-400 dark:placeholder-[#8e9fa8] transition-all outline-none"
+            placeholder="Search notices, tasks, documents, deadlines..."
+            className="w-full pl-10 sm:pl-12 pr-20 sm:pr-24 py-3 sm:py-3.5 rounded-2xl bg-slate-100/80 dark:bg-[#141f26] border border-slate-200/80 dark:border-[#23333d] focus:bg-white dark:focus:bg-[#152026] focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-ring)] text-xs sm:text-sm text-slate-900 dark:text-[#e6edf2] placeholder-slate-400 dark:placeholder-[#8e9fa8] transition-all outline-none"
           />
 
-          <div className="absolute right-3 flex items-center gap-1.5">
+          <div className="absolute right-2.5 sm:right-3 flex items-center gap-1">
             {query && (
               <button
                 onClick={() => setQuery('')}
-                className="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-[#e6edf2] text-xs font-semibold cursor-pointer"
+                className="px-2 py-1 min-h-[36px] flex items-center rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-[#e6edf2] text-xs font-semibold cursor-pointer"
                 title="Clear input"
               >
                 Clear
@@ -100,7 +100,7 @@ export default function SearchModal({
             )}
             <button
               onClick={onClose}
-              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-[#e6edf2] hover:bg-slate-200/60 dark:hover:bg-[#141f26] transition-colors cursor-pointer"
+              className="p-1.5 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-[#e6edf2] hover:bg-slate-200/60 dark:hover:bg-[#141f26] transition-colors cursor-pointer"
               title="Close search"
               aria-label="Close search modal"
             >
@@ -111,16 +111,16 @@ export default function SearchModal({
 
         {/* Quick Filter Tags (when empty query) */}
         {!cleanQuery && (
-          <div className="space-y-3 pt-1 text-xs">
+          <div className="space-y-3 pt-1 text-xs overflow-y-auto">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#8e9fa8]">
               Quick Filter Suggestions
             </span>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {['Python Lab', 'Exam Fee', 'Placement', 'Hackathon', 'College ID', 'Urgent'].map((tag) => (
                 <button
                   key={tag}
                   onClick={() => setQuery(tag)}
-                  className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] hover:text-[var(--accent-text)] text-slate-700 dark:text-[#e6edf2] border border-slate-200/60 dark:border-[#23333d] transition-colors font-medium flex items-center gap-1.5 cursor-pointer"
+                  className="px-2.5 sm:px-3 py-1.5 min-h-[36px] rounded-xl bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] hover:text-[var(--accent-text)] text-slate-700 dark:text-[#e6edf2] border border-slate-200/60 dark:border-[#23333d] transition-colors font-medium flex items-center gap-1.5 cursor-pointer text-xs"
                 >
                   <Sparkles className="w-3 h-3 text-[var(--accent-primary)]" />
                   <span>{tag}</span>
