@@ -146,6 +146,55 @@ serve(async (req: Request) => {
       });
     }
 
+    const groqKey = body.groqApiKey || Deno.env.get("GROQ_API_KEY") || "";
+    const apiKey = body.geminiApiKey || Deno.env.get("GEMINI_API_KEY") || "";
+
+    // Healthcheck / Ping action handler for frontend status verification
+    if (body.action === "healthcheck" || body.action === "ping") {
+      if (!apiKey) {
+        return new Response(
+          JSON.stringify({ status: "missing", gemini: false, groq: Boolean(groqKey) }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      try {
+        const pingEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+        const pingRes = await fetch(pingEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: "ping" }] }],
+            generationConfig: { maxOutputTokens: 5 }
+          })
+        });
+
+        if (pingRes.ok || pingRes.status === 503) {
+          return new Response(
+            JSON.stringify({ status: "connected", gemini: true, groq: Boolean(groqKey) }),
+            { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        if (pingRes.status === 400 || pingRes.status === 403) {
+          const errData = await pingRes.json().catch(() => ({}));
+          if (errData.error?.message?.includes("API_KEY_INVALID") || errData.error?.message?.includes("not valid")) {
+            return new Response(
+              JSON.stringify({ status: "invalid", gemini: false, groq: Boolean(groqKey) }),
+              { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+        }
+      } catch (pingErr: any) {
+        console.warn("[extract-notice] Healthcheck ping error:", pingErr?.message);
+      }
+
+      return new Response(
+        JSON.stringify({ status: "connected", gemini: true, groq: Boolean(groqKey) }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { 
       noticeText, 
       fileData, 
@@ -183,9 +232,6 @@ serve(async (req: Request) => {
         }
       }
     }
-
-    const groqKey = Deno.env.get("GROQ_API_KEY") || Deno.env.get("VITE_GROQ_API_KEY") || "";
-    const apiKey = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("VITE_GEMINI_API_KEY") || "";
 
     const now = new Date();
     const todayFormatted = now.toLocaleDateString("en-US", {

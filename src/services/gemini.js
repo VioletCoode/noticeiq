@@ -6,9 +6,8 @@ const GEMINI_TIMEOUT_MS = 25000;
 
 export const getGeminiApiKey = () => {
   try {
-    const envKey = (import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_LLM_API_KEY || '').trim();
     const localKey = (localStorage.getItem('gemini_api_key') || '').trim();
-    return envKey || localKey || '';
+    return localKey || '';
   } catch (err) {
     devWarn('[NoticeIQ] LocalStorage access error:', err);
     return '';
@@ -28,65 +27,35 @@ export const setGeminiApiKey = (key) => {
 };
 
 /**
- * Validates the Gemini API key status
+ * Validates the Gemini API key / AI service status via Supabase Edge Function
  */
 export async function checkApiKeyStatus(customKey = null) {
-  const apiKey = (customKey !== null ? customKey : getGeminiApiKey()).trim();
+  try {
+    const apiKey = (customKey !== null ? customKey : getGeminiApiKey()).trim();
 
-  if (!apiKey) {
+    const { data, error } = await supabase.functions.invoke('extract-notice', {
+      body: {
+        action: 'healthcheck',
+        geminiApiKey: apiKey || undefined
+      }
+    });
+
+    if (!error && data?.status) {
+      return data.status;
+    }
+
+    if (error) {
+      if (error.message && error.message.includes('429')) {
+        return 'connected';
+      }
+      devWarn('[NoticeIQ] checkApiKeyStatus Edge Function error:', error.message);
+    }
+
+    return data?.status || 'missing';
+  } catch (err) {
+    devWarn('[NoticeIQ] checkApiKeyStatus exception:', err?.message);
     return 'missing';
   }
-
-  const models = ['gemini-flash-latest', 'gemini-3.5-flash'];
-  for (const model of models) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-    try {
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        signal: controller.signal,
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: 'ping' }]
-            }
-          ],
-          generationConfig: {
-            maxOutputTokens: 5
-          }
-        })
-      });
-
-      clearTimeout(timeoutId);
-
-      if (res.ok) {
-        return 'connected';
-      }
-
-      // If 503 (high demand), the key is valid, service is just busy
-      if (res.status === 503) {
-        console.warn(`[NoticeIQ] Model ${model} is experiencing high demand (503), but API key is valid.`);
-        return 'connected';
-      }
-
-      if (res.status === 400 || res.status === 403) {
-        const errJson = await res.json().catch(() => ({}));
-        if (errJson.error?.message?.includes('API_KEY_INVALID') || errJson.error?.message?.includes('not valid')) {
-          return 'invalid';
-        }
-      }
-    } catch (err) {
-      clearTimeout(timeoutId);
-      devWarn(`[NoticeIQ] Gemini API key validation check on ${model} network error:`, err.message);
-    }
-  }
-
-  return 'connected';
 }
 
 
@@ -259,37 +228,21 @@ export async function extractNoticeWithGemini({ noticeText = '', fileData = null
     isoDate: now.toISOString().split('T')[0]
   });
 
-  // 1. ROUTE TEXT NOTICES TO GROQ
-  if (effectiveSourceType === 'text') {
-    const groqKey = getGroqApiKey();
-    if (groqKey) {
-      try {
-        devLog('[NoticeIQ] ⚡ Routing plain text notice to Groq (fast text extraction)...');
-        const groqResult = await extractNoticeWithGroq({ noticeText: cleanInputText, prompt });
-        if (groqResult && groqResult.title) {
-          devLog(`[NoticeIQ] ✅ Extracted via Groq (${groqResult._model}) in ${groqResult._durationMs}ms`);
-          return groqResult;
-        }
-      } catch (groqErr) {
-        devWarn('[NoticeIQ] ⚠️ Groq extraction error, falling back to Gemini pipeline:', groqErr?.message);
-      }
-    } else {
-      devLog('[NoticeIQ] GROQ_API_KEY not found; proceeding with Gemini multimodal pipeline.');
-    }
-  }
+  // 1. ROUTE NOTICE (TEXT OR MULTIMODAL) TO SUPABASE EDGE FUNCTION (extract-notice)
+  devLog(`[NoticeIQ] 🚀 Routing notice (${effectiveSourceType}) to server-side Supabase Edge Function (extract-notice)...`);
 
-  // 2. MULTIMODAL (IMAGE / PDF) OR TEXT FALLBACK -> GEMINI PIPELINE
-  devLog(`[NoticeIQ] 🖼️ Routing notice (${effectiveSourceType}) to Gemini multimodal pipeline...`);
+  const customGemini = customApiKey || getGeminiApiKey();
+  const customGroq = getGroqApiKey();
 
-  // Try Supabase Edge Function first
   try {
-    devLog('[NoticeIQ] Attempting extraction via Supabase Edge Function (extract-notice)...');
     const { data, error } = await supabase.functions.invoke('extract-notice', {
       body: {
         noticeText: cleanInputText,
         source_type: effectiveSourceType,
         userTimezone: userTimezone,
         timezoneOffset: timezoneOffsetStr,
+        geminiApiKey: customGemini || undefined,
+        groqApiKey: customGroq || undefined,
         fileData: fileData ? {
           base64Data: fileData.base64Data,
           mimeType: fileData.mimeType,
@@ -299,133 +252,31 @@ export async function extractNoticeWithGemini({ noticeText = '', fileData = null
     });
 
     if (!error && data?.success && data?.data) {
-      devLog('[NoticeIQ] Edge Function returned successfully.');
+      devLog(`[NoticeIQ] ✅ Edge Function returned successfully via ${data.provider || 'ai'}.`);
       return {
         ...sanitizeParsedTask(data.data),
-        _provider: 'gemini-edge'
+        _provider: data.provider || 'edge-function',
+        _model: data.model || 'server-ai'
       };
     }
 
     if (error && error.message && error.message.includes('Rate limit exceeded')) {
       throw error;
     }
-    devWarn('[NoticeIQ] Supabase Edge Function unavailable or returned error, falling back:', error || data?.error);
+
+    if (error) {
+      devWarn('[NoticeIQ] Supabase Edge Function error:', error.message);
+    }
   } catch (edgeErr) {
     if (edgeErr?.message && edgeErr.message.includes('Rate limit exceeded')) {
       throw edgeErr;
     }
-    devWarn('[NoticeIQ] Edge Function error, trying client-side fallback:', edgeErr?.message);
+    devWarn('[NoticeIQ] Edge Function error, falling back to local heuristic parser:', edgeErr?.message);
   }
 
-  // Direct client-side Gemini call if key is available
-  const apiKey = customApiKey || getGeminiApiKey();
-
-  if (!apiKey) {
-    devLog('[NoticeIQ] No direct Gemini API key found. Using heuristic client extractor fallback.');
-    return fallbackMultimodalExtractor(cleanInputText, fileData, todayFormatted);
-  }
-
-  const parts = [{ text: prompt }];
-
-  if (fileData && fileData.base64Data) {
-    parts.push({
-      inline_data: {
-        mime_type: fileData.mimeType || 'image/png',
-        data: fileData.base64Data
-      }
-    });
-  }
-
-  // Model priority: gemini-flash-latest, with gemini-3.5-flash fallback
-  const models = ['gemini-flash-latest', 'gemini-3.5-flash'];
-  let lastError = null;
-
-  for (let i = 0; i < models.length; i++) {
-    const model = models[i];
-    const isPrimary = i === 0;
-    const modelTimeout = isPrimary ? 12000 : GEMINI_TIMEOUT_MS;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), modelTimeout);
-    const callStart = Date.now();
-
-    try {
-      console.log(`[NoticeIQ Gemini] [Attempt ${i + 1}/${models.length}] Calling model: ${model} (timeout: ${modelTimeout}ms) for text: "${cleanInputText.slice(0, 60)}..."`);
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          contents: [{ parts }],
-          generationConfig: {
-            temperature: 0.1,
-            maxOutputTokens: 4096,
-            responseMimeType: 'application/json'
-          }
-        })
-      });
-
-      clearTimeout(timeoutId);
-      const durationMs = Date.now() - callStart;
-
-      console.log(`[NoticeIQ Gemini] Model ${model} HTTP response: ${response.status} ${response.statusText} (${durationMs}ms)`);
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const rawMsg = errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`;
-        console.warn(`[NoticeIQ Gemini] Model ${model} returned error (${response.status}): ${rawMsg}`);
-        throw new Error(rawMsg.replace(/AIza[0-9A-Za-z-_]{35}/g, '[MASKED_KEY]'));
-      }
-
-      const data = await response.json();
-      console.log(`[NoticeIQ Gemini] Model ${model} candidates count:`, data.candidates?.length || 0);
-      console.log(`[NoticeIQ Gemini] Model ${model} raw response payload:`, data);
-
-      const candidate = data.candidates?.[0];
-      const finishReason = candidate?.finishReason;
-      if (finishReason === 'MAX_TOKENS') {
-        console.warn(`[NoticeIQ Gemini] Model ${model} finished with MAX_TOKENS, response may be truncated!`);
-      }
-
-      const generatedText = (candidate?.content?.parts || [])
-        .map(p => p.text || '')
-        .join('')
-        .trim();
-
-      if (!generatedText) {
-        console.error(`[NoticeIQ Gemini] Model ${model} returned no content text. Full payload:`, data);
-        throw new Error('No content returned from Gemini model');
-      }
-
-      console.log(`[NoticeIQ Gemini] Model ${model} generated text:\n`, generatedText);
-      const parsed = cleanAndParseJSON(generatedText);
-      return {
-        ...sanitizeParsedTask(parsed),
-        _provider: 'gemini',
-        _model: model,
-        _durationMs: durationMs
-      };
-    } catch (err) {
-      clearTimeout(timeoutId);
-      const durationMs = Date.now() - callStart;
-      const isAbort = err.name === 'AbortError' || err.message?.includes('aborted');
-      if (isAbort) {
-        lastError = new Error(`Request timed out on ${model} after ${durationMs}ms`);
-      } else {
-        lastError = err;
-      }
-      console.warn(`[NoticeIQ Gemini] Model ${model} attempt failed (${durationMs}ms): ${lastError.message}. Attempting fallback...`);
-
-      // Only stop if the API key is completely invalid or revoked
-      if (err.message && (err.message.includes('API_KEY_INVALID') || err.message.includes('API key not valid'))) {
-        console.error(`[NoticeIQ Gemini] Unrecoverable API key error on ${model}. Stopping fallback.`);
-        break;
-      }
-    }
-  }
-
-  throw lastError || new Error('Failed to extract notice information with Gemini API');
+  // 2. Offline / local heuristic fallback when Edge Function is unreachable
+  devLog('[NoticeIQ] Using heuristic client extractor fallback (offline/network resilience).');
+  return fallbackMultimodalExtractor(cleanInputText, fileData, todayFormatted);
 }
 
 
