@@ -256,9 +256,9 @@ export default function App() {
       const code = params.get('code');
       const state = params.get('state');
 
-      if ((path.includes('/auth/callback/gmail') || path.startsWith('/auth/callback')) && code) {
+      if ((path.includes('/gmail-callback') || path.includes('/auth/callback/gmail') || path.startsWith('/auth/callback')) && code) {
         try {
-          const redirectUri = `${window.location.origin}/auth/callback/gmail`;
+          const redirectUri = `${window.location.origin}${path.includes('/auth/callback/gmail') ? '/auth/callback/gmail' : '/gmail-callback'}`;
           const result = await exchangeGmailOAuthCode(code, redirectUri);
 
           // Clean URL back to dashboard

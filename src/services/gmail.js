@@ -12,7 +12,7 @@ export function initiateGmailOAuth(userId) {
     throw new Error('VITE_GOOGLE_CLIENT_ID is not configured in your environment.');
   }
 
-  const redirectUri = `${window.location.origin}/auth/callback/gmail`;
+  const redirectUri = `${window.location.origin}/gmail-callback`;
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: redirectUri,
