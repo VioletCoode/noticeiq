@@ -172,13 +172,13 @@ export async function initOneSignal(userId = null) {
         console.log('[OneSignal] ⚙️ Executing OneSignal.init() with configuration:', {
           appId: appId,
           allowLocalhostAsSecureOrigin: true,
-          serviceWorkerPath: 'OneSignalSDKWorker.js'
+          serviceWorkerPath: 'sw.js'
         });
 
         await OneSignal.init({
           appId: import.meta.env.VITE_ONESIGNAL_APP_ID || appId,
           allowLocalhostAsSecureOrigin: true,
-          serviceWorkerPath: 'OneSignalSDKWorker.js'
+          serviceWorkerPath: 'sw.js'
         });
 
         oneSignalInitialized = true;
@@ -331,16 +331,33 @@ export async function requestNotificationPermissionAndRegister(userId = null) {
     console.log('[OneSignal] Step 5: Waiting for subscription ID and persisting to profiles.onesignal_id...');
     const subscriptionId = await syncSubscriptionWithProfile(userId);
 
+    const finalSubId = subscriptionId || OneSignal?.User?.PushSubscription?.id;
+    const finalOptedIn = OneSignal?.User?.PushSubscription?.optedIn;
+
+    if (!finalSubId && !finalOptedIn) {
+      const errorMsg = 'Notification permission is granted, but push subscription could not be registered with OneSignal (timed out). Please check network connection, service worker status, or disable ad blockers.';
+      console.error('[OneSignal] ❌ ' + errorMsg);
+      alert(errorMsg);
+      console.log('[OneSignal] ====================================================');
+      return {
+        granted: true,
+        subscriptionId: null,
+        optedIn: false,
+        error: errorMsg
+      };
+    }
+
     console.log('[OneSignal] ====================================================');
     return {
       granted: true,
-      subscriptionId: subscriptionId || OneSignal?.User?.PushSubscription?.id,
-      optedIn: OneSignal?.User?.PushSubscription?.optedIn ?? true
+      subscriptionId: finalSubId,
+      optedIn: finalOptedIn ?? true
     };
   } catch (err) {
     console.error('[OneSignal] ❌ Error during OneSignal registration flow:', err);
+    alert(`Push notification registration error: ${err.message || err}`);
     console.log('[OneSignal] ====================================================');
-    return { granted: true, error: err.message };
+    return { granted: true, error: err.message || String(err) };
   }
 }
 

@@ -39,10 +39,14 @@ export default function TopBar({
         setNotifState('subscribed');
       } else {
         setNotifState('idle');
+        if (res?.error) {
+          console.error('[TopBar] Push subscription error:', res.error);
+        }
       }
     } catch (e) {
       console.error('[TopBar] Push subscription trigger error:', e);
       setNotifState('idle');
+      alert(`Could not enable notifications: ${e.message || e}`);
     }
   };
 

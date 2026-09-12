@@ -48,6 +48,7 @@ export default defineConfig({
         ]
       },
       workbox: {
+        importScripts: ['https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js'],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         globIgnores: ['**/OneSignalSDKWorker.js'],
         navigateFallback: '/index.html',
