@@ -18,6 +18,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { supabase, fetchProfile, upsertProfile, uploadProfilePhoto } from '../services/supabase';
+import EditProfileModal from './EditProfileModal';
 
 const STORAGE_STUDENT_ID_KEY = 'noticeiq_digital_id_data_v2';
 
@@ -41,6 +42,9 @@ export default function DigitalStudentId({
 }) {
   // Card Flip state
   const [isFlipped, setIsFlipped] = useState(false);
+
+  // Edit Profile Modal State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Student Data with localStorage persistence (cleaning up any legacy placeholder names)
   const [studentData, setStudentData] = useState(() => {
@@ -76,10 +80,6 @@ export default function DigitalStudentId({
   const [copied, setCopied] = useState(false);
   const [shareSuccess, setShareSuccess] = useState(false);
 
-  // Inline editing state for fields: 'name' | 'department' | 'studentId' | 'institution' | null
-  const [editingField, setEditingField] = useState(null);
-  const [tempValue, setTempValue] = useState('');
-
   // File input ref
   const fileInputRef = useRef(null);
 
@@ -92,41 +92,33 @@ export default function DigitalStudentId({
     { id: 'kaggle', name: 'Kaggle', iconType: 'code', url: profiles.find((p) => p.id === 'kaggle')?.url || dbProfile?.kaggle_url || '' },
   ].filter((p) => Boolean(p.url));
 
-  // Social links inline editing state on the card
-  const [isEditingSocials, setIsEditingSocials] = useState(false);
-  const [socialInputs, setSocialInputs] = useState({ github: '', linkedin: '' });
-  const [savingSocials, setSavingSocials] = useState(false);
-
-  const handleSaveSocials = async () => {
-    setSavingSocials(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      const cleanGh = socialInputs.github.trim();
-      const cleanLi = socialInputs.linkedin.trim();
-      const normalizedGh = cleanGh && !/^https?:\/\//i.test(cleanGh) ? `https://${cleanGh}` : cleanGh;
-      const normalizedLi = cleanLi && !/^https?:\/\//i.test(cleanLi) ? `https://${cleanLi}` : cleanLi;
-
-      if (user) {
-        await upsertProfile(user.id, {
-          github_url: normalizedGh || null,
-          linkedin_url: normalizedLi || null
-        });
-        console.log('[NoticeIQ Digital ID] 💾 Saved social links to Supabase');
-      }
-
-      setDbProfile((prev) => ({
+  // Handler when profile is saved via EditProfileModal
+  const handleProfileSaved = (updated) => {
+    setStudentData((prev) => {
+      const next = {
         ...prev,
-        github_url: normalizedGh || null,
-        linkedin_url: normalizedLi || null
-      }));
+        name: updated.name || prev.name,
+        department: updated.department || prev.department,
+        studentId: updated.studentId || prev.studentId
+      };
+      try {
+        localStorage.setItem(STORAGE_STUDENT_ID_KEY, JSON.stringify(next));
+      } catch {}
+      return next;
+    });
 
-      setIsEditingSocials(false);
-    } catch (err) {
-      console.error('[NoticeIQ Digital ID] Error saving social links:', err);
-      alert('Failed to save social links.');
-    } finally {
-      setSavingSocials(false);
+    if (updated.name && onUpdateName) {
+      onUpdateName(updated.name);
     }
+
+    setDbProfile((prev) => ({
+      ...prev,
+      name: updated.name,
+      department: updated.department,
+      student_id: updated.studentId,
+      github_url: updated.githubUrl || null,
+      linkedin_url: updated.linkedinUrl || null
+    }));
   };
 
   // Load real student profile from Supabase
@@ -271,54 +263,7 @@ export default function DigitalStudentId({
     }
   };
 
-  // Inline editing handlers
-  const startEditing = (fieldName, currentValue, e) => {
-    if (e) e.stopPropagation();
-    setEditingField(fieldName);
-    setTempValue(currentValue || '');
-  };
 
-  const saveEditing = async (fieldName) => {
-    const val = tempValue.trim();
-    if (val) {
-      const updated = {
-        ...studentData,
-        [fieldName]: val
-      };
-      setStudentData(updated);
-      try {
-        localStorage.setItem(STORAGE_STUDENT_ID_KEY, JSON.stringify(updated));
-      } catch {}
-
-      // If name was edited, also notify parent if callback provided
-      if (fieldName === 'name' && onUpdateName) {
-        onUpdateName(val);
-      }
-
-      // Persist to Supabase when user deliberately saves an edit
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          await upsertProfile(user.id, {
-            name: updated.name,
-            student_id: updated.studentId,
-            department: updated.department,
-            photo_url: photo || null
-          });
-          console.log(`[NoticeIQ Digital ID] 💾 Saved edited ${fieldName} to Supabase:`, val);
-        }
-      } catch (err) {
-        console.error('[NoticeIQ Digital ID] Error saving edit to Supabase:', err);
-      }
-    }
-    setEditingField(null);
-    setTempValue('');
-  };
-
-  const cancelEditing = () => {
-    setEditingField(null);
-    setTempValue('');
-  };
 
   // Share or Copy handler
   const handleShare = async (e) => {
@@ -426,15 +371,28 @@ export default function DigitalStudentId({
           </h2>
         </div>
 
-        {/* Quick Flip Button */}
-        <button
-          onClick={() => setIsFlipped(!isFlipped)}
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold text-[var(--accent-text)] bg-[var(--accent-light)] hover:bg-[var(--accent-badge-bg)] border border-[var(--accent-light-border)] transition-all cursor-pointer shadow-2xs group"
-          title="Flip ID Card"
-        >
-          <RotateCw className={`w-3.5 h-3.5 transition-transform duration-500 ${isFlipped ? 'rotate-180' : 'group-hover:rotate-45'}`} />
-          <span>{isFlipped ? 'Show Front' : 'Flip to QR'}</span>
-        </button>
+        {/* Action Controls: Edit Profile & Quick Flip Button */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsEditModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold text-[var(--accent-text)] bg-[var(--accent-light)] hover:bg-[var(--accent-badge-bg)] border border-[var(--accent-light-border)] transition-all cursor-pointer shadow-2xs group"
+            title="Edit Student Profile & Credentials"
+          >
+            <Edit3 className="w-3.5 h-3.5" />
+            <span>Edit Profile</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsFlipped(!isFlipped)}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold text-slate-700 dark:text-[#e6edf2] bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] hover:text-[var(--accent-text)] border border-slate-200/70 dark:border-[#23333d] transition-all cursor-pointer shadow-2xs group"
+            title="Flip ID Card"
+          >
+            <RotateCw className={`w-3.5 h-3.5 transition-transform duration-500 ${isFlipped ? 'rotate-180' : 'group-hover:rotate-45'}`} />
+            <span>{isFlipped ? 'Show Front' : 'Flip to QR'}</span>
+          </button>
+        </div>
       </div>
 
       {/* 3D Card Container with Flip Wrapper */}
@@ -459,7 +417,7 @@ export default function DigitalStudentId({
             {/* Holographic corner shimmer accent */}
             <div className="absolute top-0 right-0 w-44 h-44 bg-gradient-to-bl from-[var(--accent-primary)]/15 via-transparent to-transparent rounded-tr-3xl pointer-events-none" />
 
-            {/* Smart Chip graphic accent */}
+            {/* Smart Chip & Action Controls accent */}
             <div className="absolute top-6 right-6 flex items-center gap-2">
               <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-[#2e2617] border border-amber-200/70 dark:border-[#523e1c] shadow-2xs">
                 <div className="w-3.5 h-3 rounded bg-amber-400/80 dark:bg-amber-500/70 border border-amber-600/40 flex items-center justify-center">
@@ -470,8 +428,19 @@ export default function DigitalStudentId({
                 </span>
               </div>
 
+              {/* Edit Profile Button on Card Face */}
+              <button
+                type="button"
+                onClick={() => setIsEditModalOpen(true)}
+                className="p-2 rounded-xl bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] text-slate-500 hover:text-[var(--accent-text)] border border-slate-200/60 dark:border-[#23333d] transition-all cursor-pointer shadow-2xs group/btn"
+                title="Edit Student Profile & Credentials"
+              >
+                <Edit3 className="w-4 h-4 text-[var(--accent-primary)] group-hover/btn:scale-110 transition-transform" />
+              </button>
+
               {/* Flip Button on Card Face */}
               <button
+                type="button"
                 onClick={() => setIsFlipped(true)}
                 className="p-2 rounded-xl bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] text-slate-500 hover:text-[var(--accent-text)] border border-slate-200/60 dark:border-[#23333d] transition-all cursor-pointer shadow-2xs group/btn"
                 title="Flip to view QR Code"
@@ -487,40 +456,9 @@ export default function DigitalStudentId({
                   <GraduationCap className="w-4.5 h-4.5" />
                 </div>
                 <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    {editingField === 'institution' ? (
-                      <div className="flex items-center gap-1">
-                        <input
-                          type="text"
-                          value={tempValue}
-                          onChange={(e) => setTempValue(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') saveEditing('institution');
-                            if (e.key === 'Escape') cancelEditing();
-                          }}
-                          className="px-2 py-0.5 text-xs font-bold rounded-lg border border-[var(--accent-primary)] bg-white dark:bg-[#141f26] text-slate-900 dark:text-[#e6edf2] outline-none"
-                          autoFocus
-                        />
-                        <button
-                          onClick={() => saveEditing('institution')}
-                          className="p-1 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 rounded cursor-pointer"
-                        >
-                          <Check className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div
-                        onClick={(e) => startEditing('institution', studentData.institution, e)}
-                        className="group/inst flex items-center gap-1 cursor-pointer"
-                        title="Click to edit institution"
-                      >
-                        <h3 className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-[#e6edf2] tracking-tight truncate">
-                          {studentData.institution}
-                        </h3>
-                        <Edit3 className="w-3 h-3 text-slate-400 group-hover/inst:text-[var(--accent-primary)] opacity-0 group-hover/inst:opacity-100 transition-opacity" />
-                      </div>
-                    )}
-                  </div>
+                  <h3 className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-[#e6edf2] tracking-tight truncate">
+                    {studentData.institution}
+                  </h3>
                   <p className="text-[10px] text-slate-400 dark:text-[#8e9fa8] font-semibold tracking-wider uppercase">
                     Official Student Identity Pass
                   </p>
@@ -586,45 +524,16 @@ export default function DigitalStudentId({
                 )}
               </div>
 
-              {/* Student Fields (Editable Inline) */}
+              {/* Student Fields (Display-Only) */}
               <div className="flex-1 min-w-0 space-y-2.5 w-full">
                 {/* Student Name */}
                 <div>
                   <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#8e9fa8]">
                     Student Name
                   </span>
-                  {editingField === 'name' ? (
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <input
-                        type="text"
-                        value={tempValue}
-                        onChange={(e) => setTempValue(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') saveEditing('name');
-                          if (e.key === 'Escape') cancelEditing();
-                        }}
-                        className="w-full px-2.5 py-1 text-sm font-extrabold rounded-xl border border-[var(--accent-primary)] bg-white dark:bg-[#141f26] text-slate-900 dark:text-[#e6edf2] outline-none"
-                        autoFocus
-                      />
-                      <button
-                        onClick={() => saveEditing('name')}
-                        className="p-1.5 bg-[var(--accent-primary)] text-white rounded-lg hover:opacity-90 cursor-pointer shadow-2xs"
-                      >
-                        <Check className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div
-                      onClick={(e) => startEditing('name', studentData.name, e)}
-                      className="group/name flex items-center gap-2 cursor-pointer mt-0.5"
-                      title="Click to edit student name"
-                    >
-                      <h4 className="text-base sm:text-lg font-black text-slate-900 dark:text-[#e6edf2] tracking-tight truncate">
-                        {studentData.name}
-                      </h4>
-                      <Edit3 className="w-3.5 h-3.5 text-slate-400 group-hover/name:text-[var(--accent-primary)] opacity-0 group-hover/name:opacity-100 transition-opacity shrink-0" />
-                    </div>
-                  )}
+                  <h4 className="text-base sm:text-lg font-black text-slate-900 dark:text-[#e6edf2] tracking-tight truncate mt-0.5">
+                    {studentData.name}
+                  </h4>
                 </div>
 
                 {/* Department & ID Number Grid */}
@@ -634,38 +543,9 @@ export default function DigitalStudentId({
                     <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#8e9fa8]">
                       Department / Program
                     </span>
-                    {editingField === 'department' ? (
-                      <div className="flex items-center gap-1 mt-0.5">
-                        <input
-                          type="text"
-                          value={tempValue}
-                          onChange={(e) => setTempValue(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') saveEditing('department');
-                            if (e.key === 'Escape') cancelEditing();
-                          }}
-                          className="w-full px-2 py-0.5 text-xs font-bold rounded-lg border border-[var(--accent-primary)] bg-white dark:bg-[#141f26] text-slate-900 dark:text-[#e6edf2] outline-none"
-                          autoFocus
-                        />
-                        <button
-                          onClick={() => saveEditing('department')}
-                          className="p-1 bg-[var(--accent-primary)] text-white rounded hover:opacity-90 cursor-pointer"
-                        >
-                          <Check className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div
-                        onClick={(e) => startEditing('department', studentData.department, e)}
-                        className="group/dept flex items-center gap-1.5 cursor-pointer mt-0.5"
-                        title="Click to edit department"
-                      >
-                        <span className="font-semibold text-slate-700 dark:text-[#d1dce2] truncate block">
-                          {studentData.department}
-                        </span>
-                        <Edit3 className="w-3 h-3 text-slate-400 group-hover/dept:text-[var(--accent-primary)] opacity-0 group-hover/dept:opacity-100 transition-opacity shrink-0" />
-                      </div>
-                    )}
+                    <span className="font-semibold text-slate-700 dark:text-[#d1dce2] truncate block mt-0.5">
+                      {studentData.department}
+                    </span>
                   </div>
 
                   {/* Student ID / Roll No */}
@@ -673,163 +553,62 @@ export default function DigitalStudentId({
                     <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#8e9fa8]">
                       Student ID / Roll No
                     </span>
-                    {editingField === 'studentId' ? (
-                      <div className="flex items-center gap-1 mt-0.5">
-                        <input
-                          type="text"
-                          value={tempValue}
-                          onChange={(e) => setTempValue(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') saveEditing('studentId');
-                            if (e.key === 'Escape') cancelEditing();
-                          }}
-                          className="w-full px-2 py-0.5 text-xs font-mono font-bold rounded-lg border border-[var(--accent-primary)] bg-white dark:bg-[#141f26] text-slate-900 dark:text-[#e6edf2] outline-none"
-                          autoFocus
-                        />
-                        <button
-                          onClick={() => saveEditing('studentId')}
-                          className="p-1 bg-[var(--accent-primary)] text-white rounded hover:opacity-90 cursor-pointer"
-                        >
-                          <Check className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div
-                        onClick={(e) => startEditing('studentId', studentData.studentId, e)}
-                        className="group/id flex items-center gap-1.5 cursor-pointer mt-0.5"
-                        title="Click to edit student ID"
-                      >
-                        <span className="font-mono font-bold text-[var(--accent-text)] bg-[var(--accent-light)] dark:bg-[#132426] px-2 py-0.5 rounded-md border border-[var(--accent-light-border)]">
-                          {studentData.studentId}
-                        </span>
-                        <Edit3 className="w-3 h-3 text-slate-400 group-hover/id:text-[var(--accent-primary)] opacity-0 group-hover/id:opacity-100 transition-opacity shrink-0" />
-                      </div>
-                    )}
+                    <div className="mt-0.5">
+                      <span className="font-mono font-bold text-[var(--accent-text)] bg-[var(--accent-light)] dark:bg-[#132426] px-2 py-0.5 rounded-md border border-[var(--accent-light-border)]">
+                        {studentData.studentId}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Bottom Row: Verified Social Links Chips + Validity & Status Badge */}
-            <div className="relative z-10 pt-3 border-t border-slate-100 dark:border-[#23333d]/80 flex flex-col justify-between gap-2.5">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
-                {/* Social & Professional Links Chips */}
-                <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                  <div className="flex items-center gap-1">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                      Profiles:
-                    </span>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSocialInputs({
-                          github: dbProfile?.github_url || profiles.find((p) => p.id === 'github')?.url || '',
-                          linkedin: dbProfile?.linkedin_url || profiles.find((p) => p.id === 'linkedin')?.url || '',
-                        });
-                        setIsEditingSocials(!isEditingSocials);
-                      }}
-                      className="p-1 rounded-md text-slate-400 hover:text-[var(--accent-primary)] hover:bg-slate-100 dark:hover:bg-[#141f26] transition-colors cursor-pointer"
-                      title="Edit GitHub & LinkedIn links"
+            <div className="relative z-10 pt-3 border-t border-slate-100 dark:border-[#23333d]/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+              {/* Social & Professional Links Chips */}
+              <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">
+                  Profiles:
+                </span>
+                {activeSocials.length > 0 ? (
+                  activeSocials.map((prof) => (
+                    <a
+                      key={prof.id}
+                      href={prof.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-slate-50 dark:bg-[#141f26] hover:bg-[var(--accent-light)] text-slate-700 dark:text-[#e6edf2] hover:text-[var(--accent-text)] border border-slate-200/60 dark:border-[#23333d] transition-colors cursor-pointer group/chip shadow-2xs"
+                      title={`${prof.name}: ${prof.url}`}
                     >
-                      <Edit3 className="w-3 h-3" />
-                    </button>
-                  </div>
-
-                  {activeSocials.length > 0 ? (
-                    activeSocials.map((prof) => (
-                      <a
-                        key={prof.id}
-                        href={prof.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-slate-50 dark:bg-[#141f26] hover:bg-[var(--accent-light)] text-slate-700 dark:text-[#e6edf2] hover:text-[var(--accent-text)] border border-slate-200/60 dark:border-[#23333d] transition-colors cursor-pointer group/chip shadow-2xs"
-                        title={`${prof.name}: ${prof.url}`}
-                      >
-                        <span className="text-[var(--accent-primary)] group-hover/chip:scale-110 transition-transform">
-                          {renderSocialIcon(prof.iconType)}
-                        </span>
-                        <span>{prof.name}</span>
-                        <ExternalLink className="w-2.5 h-2.5 opacity-40 group-hover/chip:opacity-100 transition-opacity" />
-                      </a>
-                    ))
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSocialInputs({
-                          github: dbProfile?.github_url || '',
-                          linkedin: dbProfile?.linkedin_url || '',
-                        });
-                        setIsEditingSocials(true);
-                      }}
-                      className="text-[11px] text-[var(--accent-primary)] hover:underline font-semibold cursor-pointer"
-                    >
-                      + Add GitHub / LinkedIn
-                    </button>
-                  )}
-                </div>
-
-                {/* Verified Status Tag */}
-                <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-[#142922] border border-emerald-200/60 dark:border-[#1c483a] text-emerald-700 dark:text-emerald-300 text-[10px] font-bold shadow-2xs">
-                    <CheckCircle2 className="w-3 h-3" />
-                    <span>ACTIVE STUDENT</span>
-                  </div>
-                  <span className="text-[10px] text-slate-400 font-mono">
-                    {studentData.validThru}
-                  </span>
-                </div>
+                      <span className="text-[var(--accent-primary)] group-hover/chip:scale-110 transition-transform">
+                        {renderSocialIcon(prof.iconType)}
+                      </span>
+                      <span>{prof.name}</span>
+                      <ExternalLink className="w-2.5 h-2.5 opacity-40 group-hover/chip:opacity-100 transition-opacity" />
+                    </a>
+                  ))
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="text-[11px] text-[var(--accent-primary)] hover:underline font-semibold cursor-pointer"
+                  >
+                    + Add GitHub / LinkedIn
+                  </button>
+                )}
               </div>
 
-              {/* Inline Social Links Edit Drawer */}
-              {isEditingSocials && (
-                <div 
-                  onClick={(e) => e.stopPropagation()}
-                  className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-[#141f26] border border-slate-200/70 dark:border-[#23333d] space-y-2 animate-slide-down"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 w-16 shrink-0">GitHub</span>
-                    <input
-                      type="text"
-                      value={socialInputs.github}
-                      onChange={(e) => setSocialInputs((prev) => ({ ...prev, github: e.target.value }))}
-                      placeholder="https://github.com/username"
-                      className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-slate-300 dark:border-[#23333d] bg-white dark:bg-[#1b262d] text-slate-900 dark:text-[#e6edf2] outline-none font-mono"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 w-16 shrink-0">LinkedIn</span>
-                    <input
-                      type="text"
-                      value={socialInputs.linkedin}
-                      onChange={(e) => setSocialInputs((prev) => ({ ...prev, linkedin: e.target.value }))}
-                      placeholder="https://linkedin.com/in/username"
-                      className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-slate-300 dark:border-[#23333d] bg-white dark:bg-[#1b262d] text-slate-900 dark:text-[#e6edf2] outline-none font-mono"
-                    />
-                  </div>
-                  <div className="flex items-center justify-end gap-2 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => setIsEditingSocials(false)}
-                      className="px-2.5 py-1 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      disabled={savingSocials}
-                      onClick={handleSaveSocials}
-                      className="inline-flex items-center gap-1 px-3 py-1 bg-[var(--accent-primary)] text-white text-xs font-bold rounded-lg hover:opacity-90 disabled:opacity-50 cursor-pointer shadow-2xs"
-                    >
-                      <Check className="w-3 h-3" />
-                      <span>{savingSocials ? 'Saving...' : 'Save Links'}</span>
-                    </button>
-                  </div>
+              {/* Verified Status Tag */}
+              <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-[#142922] border border-emerald-200/60 dark:border-[#1c483a] text-emerald-700 dark:text-emerald-300 text-[10px] font-bold shadow-2xs">
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span>ACTIVE STUDENT</span>
                 </div>
-              )}
+                <span className="text-[10px] text-slate-400 font-mono">
+                  {studentData.validThru}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -983,6 +762,20 @@ export default function DigitalStudentId({
           </div>
         </div>
       </div>
+
+      {/* Dedicated Centralized Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        initialData={{
+          name: studentData.name,
+          department: studentData.department,
+          studentId: studentData.studentId,
+          githubUrl: dbProfile?.github_url || profiles.find((p) => p.id === 'github')?.url || '',
+          linkedinUrl: dbProfile?.linkedin_url || profiles.find((p) => p.id === 'linkedin')?.url || ''
+        }}
+        onProfileSaved={handleProfileSaved}
+      />
     </div>
   );
 }
