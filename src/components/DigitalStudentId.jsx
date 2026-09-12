@@ -85,12 +85,49 @@ export default function DigitalStudentId({
 
   // Active social links: merge props from CampusVault with direct DB profile links
   const activeSocials = [
-    { name: 'GitHub', url: profiles.find((p) => p.id === 'github')?.url || dbProfile?.github_url || '' },
-    { name: 'LinkedIn', url: profiles.find((p) => p.id === 'linkedin')?.url || dbProfile?.linkedin_url || '' },
-    { name: 'Portfolio', url: profiles.find((p) => p.id === 'portfolio')?.url || dbProfile?.portfolio_url || '' },
-    { name: 'LeetCode', url: profiles.find((p) => p.id === 'leetcode')?.url || dbProfile?.leetcode_url || '' },
-    { name: 'Kaggle', url: profiles.find((p) => p.id === 'kaggle')?.url || dbProfile?.kaggle_url || '' },
+    { id: 'github', name: 'GitHub', iconType: 'github', url: profiles.find((p) => p.id === 'github')?.url || dbProfile?.github_url || '' },
+    { id: 'linkedin', name: 'LinkedIn', iconType: 'linkedin', url: profiles.find((p) => p.id === 'linkedin')?.url || dbProfile?.linkedin_url || '' },
+    { id: 'portfolio', name: 'Portfolio', iconType: 'globe', url: profiles.find((p) => p.id === 'portfolio')?.url || dbProfile?.portfolio_url || '' },
+    { id: 'leetcode', name: 'LeetCode', iconType: 'code', url: profiles.find((p) => p.id === 'leetcode')?.url || dbProfile?.leetcode_url || '' },
+    { id: 'kaggle', name: 'Kaggle', iconType: 'code', url: profiles.find((p) => p.id === 'kaggle')?.url || dbProfile?.kaggle_url || '' },
   ].filter((p) => Boolean(p.url));
+
+  // Social links inline editing state on the card
+  const [isEditingSocials, setIsEditingSocials] = useState(false);
+  const [socialInputs, setSocialInputs] = useState({ github: '', linkedin: '' });
+  const [savingSocials, setSavingSocials] = useState(false);
+
+  const handleSaveSocials = async () => {
+    setSavingSocials(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const cleanGh = socialInputs.github.trim();
+      const cleanLi = socialInputs.linkedin.trim();
+      const normalizedGh = cleanGh && !/^https?:\/\//i.test(cleanGh) ? `https://${cleanGh}` : cleanGh;
+      const normalizedLi = cleanLi && !/^https?:\/\//i.test(cleanLi) ? `https://${cleanLi}` : cleanLi;
+
+      if (user) {
+        await upsertProfile(user.id, {
+          github_url: normalizedGh || null,
+          linkedin_url: normalizedLi || null
+        });
+        console.log('[NoticeIQ Digital ID] 💾 Saved social links to Supabase');
+      }
+
+      setDbProfile((prev) => ({
+        ...prev,
+        github_url: normalizedGh || null,
+        linkedin_url: normalizedLi || null
+      }));
+
+      setIsEditingSocials(false);
+    } catch (err) {
+      console.error('[NoticeIQ Digital ID] Error saving social links:', err);
+      alert('Failed to save social links.');
+    } finally {
+      setSavingSocials(false);
+    }
+  };
 
   // Load real student profile from Supabase
   useEffect(() => {
@@ -159,8 +196,18 @@ export default function DigitalStudentId({
         ? window.location.origin
         : 'http://localhost:5173';
 
+      const ghUrl = profiles.find((p) => p.id === 'github')?.url || dbProfile?.github_url || '';
+      const liUrl = profiles.find((p) => p.id === 'linkedin')?.url || dbProfile?.linkedin_url || '';
+
+      const queryParams = new URLSearchParams({
+        name: currentName,
+        dept: currentDept,
+        ...(ghUrl ? { gh: ghUrl } : {}),
+        ...(liUrl ? { li: liUrl } : {})
+      });
+
       // Clean, mobile-scannable URL encoding student's verification route with fallback parameters
-      const targetVerifyUrl = `${origin}/verify/${encodeURIComponent(currentId)}?name=${encodeURIComponent(currentName)}&dept=${encodeURIComponent(currentDept)}`;
+      const targetVerifyUrl = `${origin}/verify/${encodeURIComponent(currentId)}?${queryParams.toString()}`;
       setVerifyUrl(targetVerifyUrl);
 
       // Requirement 2: Log exact URL/payload being encoded into the QR code
@@ -664,47 +711,125 @@ export default function DigitalStudentId({
             </div>
 
             {/* Bottom Row: Verified Social Links Chips + Validity & Status Badge */}
-            <div className="relative z-10 pt-3 border-t border-slate-100 dark:border-[#23333d]/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
-              {/* Social & Professional Links Chips */}
-              <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">
-                  Profiles:
-                </span>
-                {activeSocials.length > 0 ? (
-                  activeSocials.map((prof) => (
-                    <a
-                      key={prof.id}
-                      href={prof.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-slate-50 dark:bg-[#141f26] hover:bg-[var(--accent-light)] text-slate-700 dark:text-[#e6edf2] hover:text-[var(--accent-text)] border border-slate-200/60 dark:border-[#23333d] transition-colors cursor-pointer group/chip shadow-2xs"
-                      title={`${prof.name}: ${prof.url}`}
+            <div className="relative z-10 pt-3 border-t border-slate-100 dark:border-[#23333d]/80 flex flex-col justify-between gap-2.5">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+                {/* Social & Professional Links Chips */}
+                <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                  <div className="flex items-center gap-1">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      Profiles:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSocialInputs({
+                          github: dbProfile?.github_url || profiles.find((p) => p.id === 'github')?.url || '',
+                          linkedin: dbProfile?.linkedin_url || profiles.find((p) => p.id === 'linkedin')?.url || '',
+                        });
+                        setIsEditingSocials(!isEditingSocials);
+                      }}
+                      className="p-1 rounded-md text-slate-400 hover:text-[var(--accent-primary)] hover:bg-slate-100 dark:hover:bg-[#141f26] transition-colors cursor-pointer"
+                      title="Edit GitHub & LinkedIn links"
                     >
-                      <span className="text-[var(--accent-primary)] group-hover/chip:scale-110 transition-transform">
-                        {renderSocialIcon(prof.iconType)}
-                      </span>
-                      <span>{prof.name}</span>
-                      <ExternalLink className="w-2.5 h-2.5 opacity-40 group-hover/chip:opacity-100 transition-opacity" />
-                    </a>
-                  ))
-                ) : (
-                  <span className="text-[11px] text-slate-400 dark:text-[#8e9fa8] italic">
-                    No links added yet (add in section below)
+                      <Edit3 className="w-3 h-3" />
+                    </button>
+                  </div>
+
+                  {activeSocials.length > 0 ? (
+                    activeSocials.map((prof) => (
+                      <a
+                        key={prof.id}
+                        href={prof.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-slate-50 dark:bg-[#141f26] hover:bg-[var(--accent-light)] text-slate-700 dark:text-[#e6edf2] hover:text-[var(--accent-text)] border border-slate-200/60 dark:border-[#23333d] transition-colors cursor-pointer group/chip shadow-2xs"
+                        title={`${prof.name}: ${prof.url}`}
+                      >
+                        <span className="text-[var(--accent-primary)] group-hover/chip:scale-110 transition-transform">
+                          {renderSocialIcon(prof.iconType)}
+                        </span>
+                        <span>{prof.name}</span>
+                        <ExternalLink className="w-2.5 h-2.5 opacity-40 group-hover/chip:opacity-100 transition-opacity" />
+                      </a>
+                    ))
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSocialInputs({
+                          github: dbProfile?.github_url || '',
+                          linkedin: dbProfile?.linkedin_url || '',
+                        });
+                        setIsEditingSocials(true);
+                      }}
+                      className="text-[11px] text-[var(--accent-primary)] hover:underline font-semibold cursor-pointer"
+                    >
+                      + Add GitHub / LinkedIn
+                    </button>
+                  )}
+                </div>
+
+                {/* Verified Status Tag */}
+                <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-[#142922] border border-emerald-200/60 dark:border-[#1c483a] text-emerald-700 dark:text-emerald-300 text-[10px] font-bold shadow-2xs">
+                    <CheckCircle2 className="w-3 h-3" />
+                    <span>ACTIVE STUDENT</span>
+                  </div>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    {studentData.validThru}
                   </span>
-                )}
+                </div>
               </div>
 
-              {/* Verified Status Tag */}
-              <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-                <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-[#142922] border border-emerald-200/60 dark:border-[#1c483a] text-emerald-700 dark:text-emerald-300 text-[10px] font-bold shadow-2xs">
-                  <CheckCircle2 className="w-3 h-3" />
-                  <span>ACTIVE STUDENT</span>
+              {/* Inline Social Links Edit Drawer */}
+              {isEditingSocials && (
+                <div 
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-[#141f26] border border-slate-200/70 dark:border-[#23333d] space-y-2 animate-slide-down"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 w-16 shrink-0">GitHub</span>
+                    <input
+                      type="text"
+                      value={socialInputs.github}
+                      onChange={(e) => setSocialInputs((prev) => ({ ...prev, github: e.target.value }))}
+                      placeholder="https://github.com/username"
+                      className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-slate-300 dark:border-[#23333d] bg-white dark:bg-[#1b262d] text-slate-900 dark:text-[#e6edf2] outline-none font-mono"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 w-16 shrink-0">LinkedIn</span>
+                    <input
+                      type="text"
+                      value={socialInputs.linkedin}
+                      onChange={(e) => setSocialInputs((prev) => ({ ...prev, linkedin: e.target.value }))}
+                      placeholder="https://linkedin.com/in/username"
+                      className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-slate-300 dark:border-[#23333d] bg-white dark:bg-[#1b262d] text-slate-900 dark:text-[#e6edf2] outline-none font-mono"
+                    />
+                  </div>
+                  <div className="flex items-center justify-end gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingSocials(false)}
+                      className="px-2.5 py-1 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      disabled={savingSocials}
+                      onClick={handleSaveSocials}
+                      className="inline-flex items-center gap-1 px-3 py-1 bg-[var(--accent-primary)] text-white text-xs font-bold rounded-lg hover:opacity-90 disabled:opacity-50 cursor-pointer shadow-2xs"
+                    >
+                      <Check className="w-3 h-3" />
+                      <span>{savingSocials ? 'Saving...' : 'Save Links'}</span>
+                    </button>
+                  </div>
                 </div>
-                <span className="text-[10px] text-slate-400 font-mono">
-                  {studentData.validThru}
-                </span>
-              </div>
+              )}
             </div>
           </div>
 

@@ -25,6 +25,8 @@ export default function PublicVerifyScreen({ studentId, onGoToDashboard }) {
   const paramName = searchParams.get('name') || searchParams.get('n') || '';
   const paramDept = searchParams.get('dept') || searchParams.get('d') || '';
   const paramInst = searchParams.get('inst') || '';
+  const paramGithub = searchParams.get('gh') || searchParams.get('github') || '';
+  const paramLinkedin = searchParams.get('li') || searchParams.get('linkedin') || '';
 
   useEffect(() => {
     let isMounted = true;
@@ -76,8 +78,8 @@ export default function PublicVerifyScreen({ studentId, onGoToDashboard }) {
 
   // Social Links
   const socialLinks = [
-    { name: 'GitHub', url: profile?.github_url, type: 'github' },
-    { name: 'LinkedIn', url: profile?.linkedin_url, type: 'linkedin' },
+    { name: 'GitHub', url: profile?.github_url || paramGithub, type: 'github' },
+    { name: 'LinkedIn', url: profile?.linkedin_url || paramLinkedin, type: 'linkedin' },
     { name: 'Portfolio', url: profile?.portfolio_url, type: 'globe' },
     { name: 'LeetCode', url: profile?.leetcode_url, type: 'code' },
     { name: 'Kaggle', url: profile?.kaggle_url, type: 'code' },
