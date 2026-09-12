@@ -80,10 +80,22 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   portfolio_url TEXT,
   leetcode_url TEXT,
   kaggle_url TEXT,
+  instagram_url TEXT,
+  youtube_url TEXT,
+  twitter_url TEXT,
+  discord_url TEXT,
+  custom_links JSONB DEFAULT '[]'::jsonb,
   onesignal_id TEXT,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
+
+-- Migration for existing databases:
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS instagram_url text;
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS youtube_url text;
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS twitter_url text;
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS discord_url text;
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS custom_links jsonb DEFAULT '[]'::jsonb;
 
 -- ----------------------------------------------------------
 -- INDEXES FOR MAXIMUM QUERY PERFORMANCE
