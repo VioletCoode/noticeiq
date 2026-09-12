@@ -1,0 +1,238 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Base Light Theme */
+  --bg-page: #f8faf9;
+  --bg-card: #ffffff;
+  --bg-sidebar: #093535;
+  --border-sidebar: #0d4545;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border-subtle: rgba(226, 232, 240, 0.8);
+
+  /* Single Teal Accent */
+  --accent-primary: #0d9488;
+  --accent-hover: #0f766e;
+  --accent-light: #f0fdfa;
+  --accent-light-border: #ccfbf1;
+  --accent-text: #0f766e;
+  --accent-badge-bg: #ccfbf1;
+  --accent-badge-text: #115e59;
+  --accent-sidebar-active: #0f766e;
+  --accent-ring: rgba(13, 148, 136, 0.25);
+  --accent-shadow: rgba(13, 148, 136, 0.2);
+}
+
+/* Base Dark Theme */
+.dark {
+  --bg-page: #131b20; /* Dark charcoal-slate (softer, desaturated slate-green) */
+  --bg-card: #1b262d; /* Slightly lighter dark slate card background */
+  --bg-sidebar: #0e171b; /* Cohesive deep dark slate-teal sidebar */
+  --border-sidebar: #17232a;
+  --text-primary: #e6edf2; /* Soft off-white */
+  --text-secondary: #8e9fa8; /* Muted gray-green secondary */
+  --border-subtle: rgba(35, 51, 61, 0.8);
+
+  --accent-primary: #14b8a6; /* Natural, non-neon muted teal */
+  --accent-hover: #2dd4bf;
+  --accent-light: #132426;
+  --accent-light-border: #1a3d3d;
+  --accent-text: #2dd4bf;
+  --accent-badge-bg: #123333;
+  --accent-badge-text: #5eead4;
+  --accent-sidebar-active: #134e4a;
+  --accent-ring: rgba(20, 184, 166, 0.3);
+  --accent-shadow: rgba(20, 184, 166, 0.25);
+}
+
+@layer base {
+  /* App-wide smooth theme transitions (180ms ease-in-out) */
+  *, *::before, *::after {
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+    transition-duration: 180ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    @apply font-sans antialiased;
+  }
+
+  .dark body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+  }
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #23333d;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #334856;
+}
+
+/* Glassmorphism helpers */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.dark .glass-panel {
+  background: rgba(21, 32, 38, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+.dark .glass-card {
+  background: rgba(27, 38, 45, 0.92);
+  backdrop-filter: blur(8px);
+}
+
+/* Popover Animation */
+@keyframes popoverIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-popover {
+  animation: popoverIn 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: top right;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pageFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-fade {
+  animation: pageFadeIn 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes navPop {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-nav-pop {
+  animation: navPop 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 3D Card Flip Utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Guilloché / Security Grid Background for Digital ID */
+.bg-security-pattern {
+  background-image: radial-gradient(rgba(13, 148, 136, 0.08) 1px, transparent 1px),
+    radial-gradient(rgba(13, 148, 136, 0.04) 1px, transparent 1px);
+  background-size: 16px 16px, 8px 8px;
+  background-position: 0 0, 4px 4px;
+}
+
+.dark .bg-security-pattern {
+  background-image: radial-gradient(rgba(20, 184, 166, 0.12) 1px, transparent 1px),
+    radial-gradient(rgba(20, 184, 166, 0.06) 1px, transparent 1px);
+  background-size: 16px 16px, 8px 8px;
+  background-position: 0 0, 4px 4px;
+}
+
+/* Holographic shimmer badge effect */
+@keyframes holoShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.holographic-badge {
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(20, 184, 166, 0.25) 30%,
+    rgba(255, 255, 255, 0.45) 50%,
+    rgba(20, 184, 166, 0.25) 70%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: holoShimmer 4s infinite linear;
+}
+

@@ -1,0 +1,10 @@
+# Supabase CLI Project Configuration
+project_id = "mebosbaarocbmdnnzmja"
+
+[functions.check-alerts]
+verify_jwt = false
+schedule = "* * * * *"
+
+[functions.check-reminders]
+verify_jwt = false
+schedule = "*/5 * * * *"
