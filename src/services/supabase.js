@@ -102,6 +102,15 @@ export async function signOutUser() {
   if (error) throw error;
 }
 
+export async function resetPasswordForEmail(email, redirectTo) {
+  const redirectUrl = redirectTo || (typeof window !== 'undefined' ? `${window.location.origin}` : undefined);
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: redirectUrl
+  });
+  if (error) throw error;
+  return data;
+}
+
 export async function getCurrentSession() {
   const { data: { session }, error } = await supabase.auth.getSession();
   if (error) throw error;

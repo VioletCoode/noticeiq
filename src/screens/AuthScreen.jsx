@@ -19,6 +19,7 @@ import {
 import { 
   signUpUser, 
   signInUser, 
+  resetPasswordForEmail,
   isSupabaseConfigured,
   saveSupabaseCredentials,
   getSupabaseCredentials
@@ -26,7 +27,7 @@ import {
 import { promptPushSubscription, isPushSubscribed } from '../services/notifications';
 
 export default function AuthScreen({ onAuthSuccess, theme, onToggleTheme }) {
-  const [mode, setMode] = useState('signin'); // 'signin' | 'signup'
+  const [mode, setMode] = useState('signin'); // 'signin' | 'signup' | 'forgot'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -69,8 +70,27 @@ export default function AuthScreen({ onAuthSuccess, theme, onToggleTheme }) {
       return;
     }
 
-    if (!email.trim() || !password.trim()) {
-      setErrorMessage('Please enter both your email address and password.');
+    if (!email.trim()) {
+      setErrorMessage('Please enter your email address.');
+      return;
+    }
+
+    if (mode === 'forgot') {
+      setIsLoading(true);
+      try {
+        await resetPasswordForEmail(email.trim());
+        setInfoMessage('Password reset link sent! Please check your email inbox.');
+      } catch (err) {
+        console.error('[NoticeIQ Reset Password Error]:', err);
+        setErrorMessage(err.message || 'Failed to send password reset email. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+
+    if (!password.trim()) {
+      setErrorMessage('Please enter your password.');
       return;
     }
 
@@ -192,12 +212,14 @@ export default function AuthScreen({ onAuthSuccess, theme, onToggleTheme }) {
               <span>Campus Intelligence Platform</span>
             </div>
             <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-[#e6edf2]">
-              {mode === 'signin' ? 'Welcome Back' : 'Create Your Account'}
+              {mode === 'signin' ? 'Welcome Back' : mode === 'signup' ? 'Create Your Account' : 'Reset Your Password'}
             </h1>
             <p className="text-xs text-slate-500 dark:text-[#8e9fa8] font-medium">
               {mode === 'signin'
                 ? 'Sign in to access your synchronized campus deadlines and documents'
-                : 'Join NoticeIQ to track college circulars with instant AI extraction'}
+                : mode === 'signup'
+                ? 'Join NoticeIQ to track college circulars with instant AI extraction'
+                : 'Enter your registered email to receive a secure password reset link'}
             </p>
           </div>
 
@@ -289,36 +311,46 @@ export default function AuthScreen({ onAuthSuccess, theme, onToggleTheme }) {
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Password
-                </label>
-                {mode === 'signin' && (
-                  <span className="text-[11px] text-[var(--accent-primary)] hover:underline cursor-pointer font-semibold">
-                    Forgot password?
-                  </span>
-                )}
+            {mode !== 'forgot' && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Password
+                  </label>
+                  {mode === 'signin' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMode('forgot');
+                        setErrorMessage('');
+                        setInfoMessage('');
+                      }}
+                      className="text-[11px] text-[var(--accent-primary)] hover:underline cursor-pointer font-semibold bg-transparent border-0 p-0"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <div className="relative flex items-center">
+                  <Lock className="w-4 h-4 absolute left-3.5 text-slate-400 dark:text-[#8e9fa8]" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full pl-10 pr-10 py-2.5 text-xs rounded-2xl bg-slate-50 dark:bg-[#141f26] border border-slate-200/80 dark:border-[#23333d] text-slate-900 dark:text-[#e6edf2] placeholder-slate-400 dark:placeholder-[#8e9fa8]/60 focus:outline-none focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-ring)] transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
-              <div className="relative flex items-center">
-                <Lock className="w-4 h-4 absolute left-3.5 text-slate-400 dark:text-[#8e9fa8]" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 text-xs rounded-2xl bg-slate-50 dark:bg-[#141f26] border border-slate-200/80 dark:border-[#23333d] text-slate-900 dark:text-[#e6edf2] placeholder-slate-400 dark:placeholder-[#8e9fa8]/60 focus:outline-none focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-ring)] transition-all"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
+            )}
 
             <button
               type="submit"
@@ -329,11 +361,31 @@ export default function AuthScreen({ onAuthSuccess, theme, onToggleTheme }) {
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>{mode === 'signin' ? 'Sign In to NoticeIQ' : 'Create Student Account'}</span>
+                  <span>
+                    {mode === 'signin'
+                      ? 'Sign In to NoticeIQ'
+                      : mode === 'signup'
+                      ? 'Create Student Account'
+                      : 'Send Password Reset Link'}
+                  </span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
+
+            {mode === 'forgot' && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('signin');
+                  setErrorMessage('');
+                  setInfoMessage('');
+                }}
+                className="w-full py-2 text-center text-xs font-semibold text-slate-500 dark:text-[#8e9fa8] hover:text-[var(--accent-primary)] transition-colors cursor-pointer"
+              >
+                &larr; Back to Sign In
+              </button>
+            )}
 
             {/* Instant Demo Access Button */}
             <button
