@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   Sparkles, 
   ShieldCheck, 
@@ -103,6 +103,53 @@ export default function Dashboard({
 
   // Audio Briefing state
   const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // Pull-to-refresh native feel state
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const touchStartY = useRef(0);
+  const isPulling = useRef(false);
+
+  const handleTouchStart = (e) => {
+    if (window.scrollY <= 0 && !isRefreshing) {
+      touchStartY.current = e.touches[0].clientY;
+      isPulling.current = true;
+    } else {
+      isPulling.current = false;
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isPulling.current || isRefreshing) return;
+    const currentY = e.touches[0].clientY;
+    const diff = currentY - touchStartY.current;
+    if (diff > 0 && window.scrollY <= 0) {
+      const distance = Math.min(diff * 0.4, 65);
+      setPullDistance(distance);
+    } else {
+      setPullDistance(0);
+    }
+  };
+
+  const handleTouchEnd = async () => {
+    if (!isPulling.current) return;
+    isPulling.current = false;
+    if (pullDistance > 45) {
+      setIsRefreshing(true);
+      setPullDistance(48);
+      try {
+        if (onRefreshTasks) await onRefreshTasks();
+      } catch (err) {
+        console.warn('Refresh error:', err);
+      }
+      setTimeout(() => {
+        setIsRefreshing(false);
+        setPullDistance(0);
+      }, 500);
+    } else {
+      setPullDistance(0);
+    }
+  };
 
   const handleToggleBriefing = () => {
     if (typeof window !== 'undefined' && window.speechSynthesis?.speaking && isSpeaking) {
@@ -398,7 +445,26 @@ export default function Dashboard({
   };
 
   return (
-    <div className="p-3 sm:p-5 md:p-8 max-w-7xl mx-auto space-y-5 sm:space-y-6 animate-fade-in">
+    <div 
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className="p-3 sm:p-5 md:p-8 max-w-7xl mx-auto space-y-5 sm:space-y-6 animate-fade-in"
+    >
+      {/* Pull-to-refresh Visual Indicator */}
+      <div
+        className="flex items-center justify-center overflow-hidden transition-all duration-200"
+        style={{
+          height: `${pullDistance}px`,
+          opacity: pullDistance > 10 ? Math.min(pullDistance / 45, 1) : 0,
+        }}
+        aria-hidden={pullDistance === 0}
+      >
+        <div className="flex items-center gap-2 text-xs font-semibold text-[var(--accent-text)] bg-white dark:bg-[#1b262d] px-3.5 py-1.5 rounded-full shadow-xs border border-slate-200/80 dark:border-[#23333d] select-none">
+          <RefreshCw className={`w-3.5 h-3.5 text-[var(--accent-primary)] ${isRefreshing ? 'animate-spin' : ''}`} style={{ transform: isRefreshing ? undefined : `rotate(${pullDistance * 6}deg)` }} />
+          <span>{isRefreshing ? 'Refreshing tasks...' : pullDistance > 45 ? 'Release to refresh' : 'Pull to refresh'}</span>
+        </div>
+      </div>
       
       {/* iOS PWA PROMPT BANNER */}
       {showIosBanner && !dismissIosPrompt && (

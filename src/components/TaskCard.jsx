@@ -34,7 +34,16 @@ export default function TaskCard({
   } = task;
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
   const menuRef = useRef(null);
+
+  const handleCompleteClick = () => {
+    if (!completed) {
+      setIsCompleting(true);
+      setTimeout(() => setIsCompleting(false), 500);
+    }
+    onToggleComplete(id);
+  };
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -95,7 +104,9 @@ export default function TaskCard({
 
   return (
     <div
-      className={`group rounded-3xl p-4 sm:p-5 md:p-6 border transition-all duration-180 relative overflow-hidden flex flex-col sm:flex-row items-start gap-3.5 sm:gap-5 ${
+      className={`group rounded-3xl p-4 sm:p-5 md:p-6 border transition-all duration-200 relative overflow-hidden flex flex-col sm:flex-row items-start gap-3.5 sm:gap-5 active:scale-[0.985] select-none ${
+        isCompleting ? 'animate-task-glow ring-2 ring-emerald-500/30' : ''
+      } ${
         completed 
           ? 'border-slate-200/60 dark:border-[#23333d]/60 bg-slate-50/70 dark:bg-[#141f26]/50 opacity-60' 
           : currentPriority.cardClass
@@ -150,14 +161,14 @@ export default function TaskCard({
           {/* Right Action Controls: Checkbox + Kebab Menu */}
           <div className="flex items-center gap-1 shrink-0">
             <button
-              onClick={() => onToggleComplete(id)}
+              onClick={handleCompleteClick}
               title={completed ? 'Mark task as active' : 'Mark task as done'}
-              className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-[var(--accent-text)] hover:bg-[var(--accent-light)] rounded-xl transition-colors cursor-pointer"
+              className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-[var(--accent-text)] hover:bg-[var(--accent-light)] rounded-xl transition-all duration-150 active:scale-75 cursor-pointer"
             >
-              {completed ? (
-                <CheckCircle2 className="w-5 h-5 text-[var(--accent-primary)] fill-[var(--accent-light)]" />
+              {completed || isCompleting ? (
+                <CheckCircle2 className={`w-5 h-5 text-[var(--accent-primary)] fill-[var(--accent-light)] ${isCompleting ? 'animate-check-pop text-emerald-500 fill-emerald-100' : ''}`} />
               ) : (
-                <Circle className="w-5 h-5 text-slate-300 dark:text-slate-600 hover:text-[var(--accent-primary)]" />
+                <Circle className="w-5 h-5 text-slate-300 dark:text-slate-600 hover:text-[var(--accent-primary)] transition-colors" />
               )}
             </button>
 
@@ -165,7 +176,7 @@ export default function TaskCard({
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#141f26] rounded-xl transition-colors cursor-pointer"
+                className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#141f26] rounded-xl transition-all duration-150 active:scale-90 cursor-pointer"
                 title="More options"
               >
                 <MoreVertical className="w-4 h-4" />
@@ -178,7 +189,7 @@ export default function TaskCard({
                       setIsMenuOpen(false);
                       onDelete(id);
                     }}
-                    className="w-full text-left px-3 py-2 min-h-[40px] text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 flex items-center gap-2 font-medium cursor-pointer"
+                    className="w-full text-left px-3 py-2 min-h-[40px] text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 active:scale-95 flex items-center gap-2 font-medium transition-all duration-150 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Delete</span>

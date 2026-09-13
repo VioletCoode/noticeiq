@@ -532,8 +532,8 @@ export default function App() {
           />
         </div>
 
-        {/* Main Content Area with Smooth Page Transition */}
-        <main className="flex-1 min-h-[calc(100vh-4rem)] overflow-y-auto pb-20 md:pb-8">
+        {/* Main Content Area with Smooth Page Transition & Safe-Area Padding */}
+        <main className="flex-1 min-h-[calc(100vh-4rem)] overflow-y-auto pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] md:pb-8">
           {gmailNotice && (
             <div className={`m-4 p-4 rounded-2xl border text-xs flex items-center justify-between gap-3 shadow-xs animate-slide-down ${
               gmailNotice.type === 'error'

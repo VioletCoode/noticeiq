@@ -89,7 +89,7 @@ export default function TopBar({
   const isDark = theme === 'dark';
 
   return (
-    <header className="h-16 bg-white/95 dark:bg-[#152026]/95 backdrop-blur-md border-b border-slate-200/60 dark:border-[#1e2d36]/70 sticky top-0 z-40 px-2.5 sm:px-4 md:px-8 flex items-center justify-between shadow-2xs rounded-b-2xl md:rounded-b-3xl transition-colors">
+    <header className="h-[calc(4rem+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)] bg-white/95 dark:bg-[#152026]/95 backdrop-blur-md border-b border-slate-200/60 dark:border-[#1e2d36]/70 sticky top-0 z-40 px-2.5 sm:px-4 md:px-8 flex items-center justify-between shadow-2xs rounded-b-2xl md:rounded-b-3xl transition-colors select-none">
       {/* Far Left: Brand / Logo */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         <div className="w-9 h-9 rounded-xl bg-[var(--accent-primary)] flex items-center justify-center text-white shadow-2xs">
@@ -111,7 +111,7 @@ export default function TopBar({
           onClick={() => {
             if (onOpenSearch) onOpenSearch();
           }}
-          className="w-full flex items-center justify-between px-3 sm:px-4 py-2 min-h-[40px] rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/70 dark:hover:bg-[#23333d] border border-slate-200/60 dark:border-[#23333d]/80 text-xs sm:text-sm text-slate-500 dark:text-[#8e9fa8] transition-all group shadow-2xs cursor-pointer text-left"
+          className="w-full flex items-center justify-between px-3 sm:px-4 py-2 min-h-[40px] rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/70 dark:hover:bg-[#23333d] active:scale-95 border border-slate-200/60 dark:border-[#23333d]/80 text-xs sm:text-sm text-slate-500 dark:text-[#8e9fa8] transition-all group shadow-2xs cursor-pointer text-left"
           title="Search notices, documents, and tasks (Ctrl + /)"
           aria-label="Open search popup"
         >
@@ -136,7 +136,7 @@ export default function TopBar({
           id="theme-toggle-btn"
           type="button"
           onClick={onToggleTheme}
-          className="w-9 h-9 rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/80 dark:hover:bg-[#23333d] text-slate-700 dark:text-[#e6edf2] flex items-center justify-center transition-colors border border-slate-200/60 dark:border-[#23333d] cursor-pointer"
+          className="w-9 h-9 rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/80 dark:hover:bg-[#23333d] active:scale-90 text-slate-700 dark:text-[#e6edf2] flex items-center justify-center transition-all border border-slate-200/60 dark:border-[#23333d] cursor-pointer"
           title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >

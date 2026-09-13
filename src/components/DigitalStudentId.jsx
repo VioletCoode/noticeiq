@@ -427,7 +427,7 @@ export default function DigitalStudentId({
           <button
             type="button"
             onClick={() => setIsEditModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold text-[var(--accent-text)] bg-[var(--accent-light)] hover:bg-[var(--accent-badge-bg)] border border-[var(--accent-light-border)] transition-all cursor-pointer shadow-2xs group"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold text-[var(--accent-text)] bg-[var(--accent-light)] hover:bg-[var(--accent-badge-bg)] active:scale-95 border border-[var(--accent-light-border)] transition-all cursor-pointer shadow-2xs group"
             title="Edit Student Profile & Credentials"
           >
             <Edit3 className="w-3.5 h-3.5" />
@@ -437,7 +437,7 @@ export default function DigitalStudentId({
           <button
             type="button"
             onClick={() => setIsFlipped(!isFlipped)}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold text-slate-700 dark:text-[#e6edf2] bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] hover:text-[var(--accent-text)] border border-slate-200/70 dark:border-[#23333d] transition-all cursor-pointer shadow-2xs group"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold text-slate-700 dark:text-[#e6edf2] bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] hover:text-[var(--accent-text)] active:scale-95 border border-slate-200/70 dark:border-[#23333d] transition-all cursor-pointer shadow-2xs group"
             title="Flip ID Card"
           >
             <RotateCw className={`w-3.5 h-3.5 transition-transform duration-500 ${isFlipped ? 'rotate-180' : 'group-hover:rotate-45'}`} />

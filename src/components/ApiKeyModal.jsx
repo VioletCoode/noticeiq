@@ -239,7 +239,7 @@ export default function ApiKeyModal({ isOpen, onClose, onKeyUpdated }) {
             <button
               type="button"
               onClick={handleClear}
-              className="text-xs text-slate-400 dark:text-[#8e9fa8] hover:text-rose-600 dark:hover:text-rose-400 font-medium transition-colors cursor-pointer min-h-[40px] px-2 flex items-center"
+              className="text-xs text-slate-400 dark:text-[#8e9fa8] hover:text-rose-600 dark:hover:text-rose-400 active:scale-95 font-medium transition-all cursor-pointer min-h-[40px] px-2 flex items-center"
             >
               Clear Settings
             </button>
@@ -247,14 +247,14 @@ export default function ApiKeyModal({ isOpen, onClose, onKeyUpdated }) {
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 min-h-[44px] text-xs font-semibold text-slate-600 dark:text-[#8e9fa8] hover:bg-slate-100 dark:hover:bg-[#141f26] rounded-xl transition-colors cursor-pointer"
+                className="px-4 py-2 min-h-[44px] text-xs font-semibold text-slate-600 dark:text-[#8e9fa8] hover:bg-slate-100 dark:hover:bg-[#141f26] active:scale-95 rounded-xl transition-all cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSaving}
-                className="px-5 py-2 min-h-[44px] text-xs font-bold text-white bg-[var(--accent-primary)] hover:opacity-90 rounded-xl shadow-2xs transition-all flex items-center gap-1.5 active:scale-[0.98] cursor-pointer"
+                className="px-5 py-2 min-h-[44px] text-xs font-bold text-white bg-[var(--accent-primary)] hover:opacity-90 active:scale-95 rounded-xl shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 {savedSuccess ? (
                   <>
