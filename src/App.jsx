@@ -504,7 +504,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] flex flex-col text-slate-900 dark:text-[#e6edf2] selection:bg-[var(--accent-badge-bg)] selection:text-[var(--accent-text)] font-sans">
+    <div className="min-h-screen bg-[var(--bg-page)] flex flex-col text-slate-900 dark:text-[#e6edf2] selection:bg-[var(--accent-badge-bg)] selection:text-[var(--accent-text)] font-sans w-full max-w-full overflow-x-hidden">
       {/* Top Bar with Single 1-Click Theme Toggle & Profile Menu */}
       <TopBar
         userName={userName}
@@ -519,7 +519,7 @@ export default function App() {
         notifications={reminders}
       />
 
-      <div className="flex-1 flex flex-col md:flex-row">
+      <div className="flex-1 flex flex-col md:flex-row w-full max-w-full overflow-x-hidden">
         {/* Left Sidebar (Desktop / Tablet) */}
         <div className="hidden md:block">
           <Sidebar
@@ -533,7 +533,7 @@ export default function App() {
         </div>
 
         {/* Main Content Area with Smooth Page Transition & Safe-Area Padding */}
-        <main className="flex-1 min-h-[calc(100vh-4rem)] overflow-y-auto pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] md:pb-8">
+        <main className="flex-1 w-full max-w-full min-h-[calc(100vh-4rem)] overflow-y-auto overflow-x-hidden pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] md:pb-8">
           {gmailNotice && (
             <div className={`m-4 p-4 rounded-2xl border text-xs flex items-center justify-between gap-3 shadow-xs animate-slide-down ${
               gmailNotice.type === 'error'

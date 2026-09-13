@@ -89,11 +89,11 @@ export default function TopBar({
   const isDark = theme === 'dark';
 
   return (
-    <header className="h-[calc(4rem+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)] bg-white/95 dark:bg-[#152026]/95 backdrop-blur-md border-b border-slate-200/60 dark:border-[#1e2d36]/70 sticky top-0 z-40 px-2.5 sm:px-4 md:px-8 flex items-center justify-between shadow-2xs rounded-b-2xl md:rounded-b-3xl transition-colors select-none">
+    <header className="h-[calc(4rem+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)] bg-white/95 dark:bg-[#152026]/95 backdrop-blur-md border-b border-slate-200/60 dark:border-[#1e2d36]/70 sticky top-0 z-40 px-2 sm:px-4 md:px-8 flex items-center justify-between shadow-2xs rounded-b-2xl md:rounded-b-3xl transition-colors select-none w-full max-w-full overflow-hidden">
       {/* Far Left: Brand / Logo */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-        <div className="w-9 h-9 rounded-xl bg-[var(--accent-primary)] flex items-center justify-center text-white shadow-2xs">
-          <GraduationCap className="w-5 h-5" aria-hidden="true" />
+        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-[#18305A] via-[#493C62] to-[#BB81B5] flex items-center justify-center text-white shadow-2xs">
+          <GraduationCap className="w-4.5 h-4.5 sm:w-5 sm:h-5" aria-hidden="true" />
         </div>
         <div className="hidden sm:flex items-center gap-1.5">
           <span className="font-extrabold text-lg text-slate-900 dark:text-[#e6edf2] tracking-tight">NoticeIQ</span>
@@ -104,20 +104,21 @@ export default function TopBar({
       </div>
 
       {/* Centered: Search Input Trigger Button (Opens Popup Search Modal) */}
-      <div className="flex-1 max-w-md mx-2 sm:mx-4 md:mx-8">
+      <div className="flex-1 min-w-0 max-w-md mx-1.5 sm:mx-4 md:mx-8">
         <button
           id="topbar-search-trigger-btn"
           type="button"
           onClick={() => {
             if (onOpenSearch) onOpenSearch();
           }}
-          className="w-full flex items-center justify-between px-3 sm:px-4 py-2 min-h-[40px] rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/70 dark:hover:bg-[#23333d] active:scale-95 border border-slate-200/60 dark:border-[#23333d]/80 text-xs sm:text-sm text-slate-500 dark:text-[#8e9fa8] transition-all group shadow-2xs cursor-pointer text-left"
+          className="w-full flex items-center justify-between px-2.5 sm:px-4 py-1.5 sm:py-2 min-h-[36px] sm:min-h-[40px] rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/70 dark:hover:bg-[#23333d] active:scale-95 border border-slate-200/60 dark:border-[#23333d]/80 text-xs sm:text-sm text-slate-500 dark:text-[#8e9fa8] transition-all group shadow-2xs cursor-pointer text-left"
           title="Search notices, documents, and tasks (Ctrl + /)"
           aria-label="Open search popup"
         >
-          <div className="flex items-center gap-2.5 min-w-0">
-            <Search className="w-4 h-4 text-[var(--accent-primary)] shrink-0 group-hover:scale-105 transition-transform" aria-hidden="true" />
-            <span className="truncate">Search notices, tasks, documents...</span>
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--accent-primary)] shrink-0 group-hover:scale-105 transition-transform" aria-hidden="true" />
+            <span className="truncate hidden sm:inline">Search notices, tasks, documents...</span>
+            <span className="truncate sm:hidden text-xs">Search notices...</span>
           </div>
 
           <div className="hidden sm:flex items-center gap-1 shrink-0 ml-2">
@@ -129,14 +130,14 @@ export default function TopBar({
       </div>
 
       {/* Right Side: Single 1-Click Theme Toggle Button + Notification Bell + User Profile Chip */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
         
         {/* Single Theme Toggle Button (Moon in Light mode -> switches to dark; Sun in Dark mode -> switches to light) */}
         <button
           id="theme-toggle-btn"
           type="button"
           onClick={onToggleTheme}
-          className="w-9 h-9 rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/80 dark:hover:bg-[#23333d] active:scale-90 text-slate-700 dark:text-[#e6edf2] flex items-center justify-center transition-all border border-slate-200/60 dark:border-[#23333d] cursor-pointer"
+          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/80 dark:hover:bg-[#23333d] active:scale-90 text-slate-700 dark:text-[#e6edf2] flex items-center justify-center transition-all border border-slate-200/60 dark:border-[#23333d] cursor-pointer shrink-0"
           title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
@@ -147,13 +148,13 @@ export default function TopBar({
           )}
         </button>
 
-        {/* Manual Enable Notifications Trigger Button */}
+        {/* Manual Enable Notifications Trigger Button (Desktop/Tablet Only) */}
         <button
           id="enable-notifications-btn"
           type="button"
           onClick={handleEnableNotifications}
           disabled={notifState === 'prompting'}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border border-teal-200/80 dark:border-teal-800/80 hover:bg-teal-100 dark:hover:bg-teal-900/60 transition-all shadow-2xs cursor-pointer active:scale-95 disabled:opacity-60"
+          className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border border-teal-200/80 dark:border-teal-800/80 hover:bg-teal-100 dark:hover:bg-teal-900/60 transition-all shadow-2xs cursor-pointer active:scale-95 disabled:opacity-60 shrink-0"
           title="Enable OneSignal Push Notifications"
           aria-label="Enable Notifications"
         >
@@ -173,12 +174,12 @@ export default function TopBar({
             id="notifications-toggle-btn"
             type="button"
             onClick={() => setShowNotifications(!showNotifications)}
-            className="w-9 h-9 rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/80 dark:hover:bg-[#23333d] text-slate-600 dark:text-[#8e9fa8] flex items-center justify-center transition-colors relative border border-slate-200/60 dark:border-[#23333d] cursor-pointer"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/80 dark:hover:bg-[#23333d] text-slate-600 dark:text-[#8e9fa8] flex items-center justify-center transition-colors relative border border-slate-200/60 dark:border-[#23333d] cursor-pointer shrink-0"
             title="Notifications"
             aria-label="View notifications"
           >
             <Bell className="w-4 h-4" aria-hidden="true" />
-            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-[#152026]"></span>
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-[#152026]"></span>
           </button>
 
           {/* Notification dropdown popover */}
@@ -230,15 +231,15 @@ export default function TopBar({
         </div>
 
         {/* User Profile Chip */}
-        <div className="relative" ref={profileRef}>
+        <div className="relative shrink-0" ref={profileRef}>
           <button
             id="profile-menu-btn"
             type="button"
             onClick={() => setIsProfileOpen(!isProfileOpen)}
-            className="flex items-center gap-2 pl-1.5 pr-2.5 sm:pr-3 py-1 min-h-[38px] rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/80 dark:hover:bg-[#23333d] border border-slate-200/60 dark:border-[#23333d] transition-all group cursor-pointer"
+            className="flex items-center gap-1.5 sm:gap-2 pl-1 sm:pl-1.5 pr-2 sm:pr-3 py-1 min-h-[34px] sm:min-h-[38px] rounded-full bg-slate-100/80 dark:bg-[#1b262d] hover:bg-slate-200/80 dark:hover:bg-[#23333d] border border-slate-200/60 dark:border-[#23333d] transition-all group cursor-pointer shrink-0"
             aria-label="Open profile settings"
           >
-            <div className="w-7 h-7 rounded-full bg-[var(--accent-primary)] text-white flex items-center justify-center font-bold text-xs shadow-2xs">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#18305A] via-[#493C62] to-[#BB81B5] text-white flex items-center justify-center font-bold text-xs shadow-2xs">
               {userName.charAt(0).toUpperCase()}
             </div>
             <div className="text-left hidden md:block leading-tight">

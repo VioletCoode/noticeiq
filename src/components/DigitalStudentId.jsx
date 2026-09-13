@@ -472,7 +472,7 @@ export default function DigitalStudentId({
               transform: 'rotateY(0deg)',
               WebkitTransform: 'rotateY(0deg)'
             }}
-            className={`w-full h-full rounded-3xl p-4 sm:p-6 bg-white dark:bg-[#1b262d] border border-slate-200/80 dark:border-[#23333d] backface-hidden relative overflow-hidden flex flex-col justify-between transition-colors ${
+            className={`w-full h-full rounded-3xl p-4 sm:p-6 card-digital-id border backface-hidden relative overflow-hidden flex flex-col justify-between transition-colors shadow-2xs ${
               isFlipped ? 'pointer-events-none' : ''
             }`}
           >
@@ -480,15 +480,15 @@ export default function DigitalStudentId({
             <div className="absolute inset-0 bg-security-pattern pointer-events-none opacity-80" />
 
             {/* Holographic corner shimmer accent */}
-            <div className="absolute top-0 right-0 w-44 h-44 bg-gradient-to-bl from-[var(--accent-primary)]/15 via-transparent to-transparent rounded-tr-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-[#BB81B5]/20 via-[#493C62]/10 to-transparent rounded-tr-3xl pointer-events-none" />
 
             {/* Smart Chip & Action Controls accent */}
             <div className="absolute top-4 sm:top-6 right-4 sm:right-6 flex items-center gap-1.5 sm:gap-2">
-              <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-[#2e2617] border border-amber-200/70 dark:border-[#523e1c] shadow-2xs">
-                <div className="w-3.5 h-3 rounded bg-amber-400/80 dark:bg-amber-500/70 border border-amber-600/40 flex items-center justify-center">
-                  <div className="w-2 h-1.5 border-t border-b border-amber-700/40" />
+              <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-[#131F35] border border-slate-200/80 dark:border-[#24375A] shadow-2xs">
+                <div className="w-3.5 h-3 rounded bg-gradient-to-r from-[#493C62] to-[#BB81B5] border border-[#18305A]/40 flex items-center justify-center">
+                  <div className="w-2 h-1.5 border-t border-b border-white/40" />
                 </div>
-                <span className="text-[9px] font-mono font-bold tracking-widest text-amber-800 dark:text-amber-300">
+                <span className="text-[9px] font-mono font-bold tracking-widest text-slate-800 dark:text-[#E2B3DD]">
                   SMART ID
                 </span>
               </div>
@@ -497,7 +497,7 @@ export default function DigitalStudentId({
               <button
                 type="button"
                 onClick={() => setIsEditModalOpen(true)}
-                className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] text-slate-500 hover:text-[var(--accent-text)] border border-slate-200/60 dark:border-[#23333d] transition-all cursor-pointer shadow-2xs group/btn"
+                className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#131F35] hover:bg-[var(--accent-light)] text-slate-500 hover:text-[var(--accent-text)] border border-slate-200/60 dark:border-[#24375A] transition-all cursor-pointer shadow-2xs group/btn"
                 title="Edit Student Profile & Credentials"
               >
                 <Edit3 className="w-4 h-4 text-[var(--accent-primary)] group-hover/btn:scale-110 transition-transform" />
@@ -507,7 +507,7 @@ export default function DigitalStudentId({
               <button
                 type="button"
                 onClick={() => setIsFlipped(true)}
-                className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] text-slate-500 hover:text-[var(--accent-text)] border border-slate-200/60 dark:border-[#23333d] transition-all cursor-pointer shadow-2xs group/btn"
+                className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#131F35] hover:bg-[var(--accent-light)] text-slate-500 hover:text-[var(--accent-text)] border border-slate-200/60 dark:border-[#24375A] transition-all cursor-pointer shadow-2xs group/btn"
                 title="Flip to view QR Code"
               >
                 <QrCode className="w-4 h-4 text-[var(--accent-primary)] group-hover/btn:scale-110 transition-transform" />
@@ -515,16 +515,16 @@ export default function DigitalStudentId({
             </div>
 
             {/* Top Branding / Institutional Row */}
-            <div className="relative z-10 flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-[#23333d]/80 pr-20 sm:pr-32">
+            <div className="relative z-10 flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-[rgba(187,129,181,0.20)] pr-20 sm:pr-32">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-xl bg-[var(--accent-primary)] text-white flex items-center justify-center shadow-2xs font-bold text-xs shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#18305A] via-[#493C62] to-[#BB81B5] text-white flex items-center justify-center shadow-2xs font-bold text-xs shrink-0">
                   <GraduationCap className="w-4.5 h-4.5" />
                 </div>
                 <div className="min-w-0">
                   <h3 className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-[#e6edf2] tracking-tight truncate">
                     {studentData.institution}
                   </h3>
-                  <p className="text-[10px] text-slate-400 dark:text-[#8e9fa8] font-semibold tracking-wider uppercase">
+                  <p className="text-[10px] text-slate-500 dark:text-[#A6B4CE] font-semibold tracking-wider uppercase">
                     Official Student Identity Pass
                   </p>
                 </div>
@@ -535,8 +535,8 @@ export default function DigitalStudentId({
             <div className="relative z-10 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
               {/* Photo Area */}
               <div className="relative shrink-0 mx-auto sm:mx-0 group/photo">
-                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1 bg-gradient-to-tr from-[var(--accent-primary)] via-emerald-400 to-teal-200 dark:from-[var(--accent-primary)] dark:to-[#1a3d3d] shadow-sm">
-                  <div className="w-full h-full rounded-[14px] bg-slate-100 dark:bg-[#141f26] overflow-hidden relative flex items-center justify-center border border-white/60 dark:border-slate-800">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1 bg-gradient-to-tr from-[#18305A] via-[#493C62] to-[#BB81B5] shadow-sm">
+                  <div className="w-full h-full rounded-[14px] bg-slate-100 dark:bg-[#131F35] overflow-hidden relative flex items-center justify-center border border-white/60 dark:border-slate-800">
                     {photo ? (
                       <img
                         src={photo}
@@ -544,7 +544,7 @@ export default function DigitalStudentId({
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-slate-100 to-slate-200 dark:from-[#1b262d] dark:to-[#141f26] text-slate-400">
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-slate-100 to-slate-200 dark:from-[#18263E] dark:to-[#131F35] text-slate-400">
                         <GraduationCap className="w-10 h-10 text-[var(--accent-primary)]/70 mb-1" />
                         <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                           Add Photo
@@ -570,7 +570,7 @@ export default function DigitalStudentId({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[var(--accent-primary)] text-white flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-all cursor-pointer border-2 border-white dark:border-[#1b262d]"
+                  className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-r from-[#493C62] to-[#BB81B5] text-white flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-all cursor-pointer border-2 border-white dark:border-[#18263E]"
                   title="Upload profile photo"
                 >
                   <Camera className="w-3.5 h-3.5" />
@@ -687,7 +687,7 @@ export default function DigitalStudentId({
               backfaceVisibility: 'hidden',
               WebkitBackfaceVisibility: 'hidden'
             }}
-            className={`w-full h-full rounded-3xl p-4 sm:p-6 bg-white dark:bg-[#1b262d] border border-slate-200/80 dark:border-[#23333d] backface-hidden rotate-y-180 absolute inset-0 flex flex-col justify-between transition-colors overflow-y-auto sm:overflow-hidden ${
+            className={`w-full h-full rounded-3xl p-4 sm:p-6 card-digital-id border backface-hidden rotate-y-180 absolute inset-0 flex flex-col justify-between transition-colors overflow-y-auto sm:overflow-hidden shadow-2xs ${
               !isFlipped ? 'pointer-events-none' : ''
             }`}
           >
@@ -695,16 +695,16 @@ export default function DigitalStudentId({
             <div className="absolute inset-0 bg-security-pattern pointer-events-none opacity-80" />
 
             {/* Back Header */}
-            <div className="relative z-10 flex items-center justify-between pb-2.5 sm:pb-3 border-b border-slate-100 dark:border-[#23333d]/80">
+            <div className="relative z-10 flex items-center justify-between pb-2.5 sm:pb-3 border-b border-slate-100 dark:border-[rgba(187,129,181,0.20)]">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-xl bg-[var(--accent-light)] text-[var(--accent-primary)] flex items-center justify-center border border-[var(--accent-light-border)]">
+                <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-[#18305A] via-[#493C62] to-[#BB81B5] text-white flex items-center justify-center shadow-2xs">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
                   <h3 className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-[#e6edf2] tracking-tight">
                     Digital Identity Verification
                   </h3>
-                  <p className="text-[10px] text-slate-400 dark:text-[#8e9fa8]">
+                  <p className="text-[10px] text-slate-400 dark:text-[#A6B4CE]">
                     Scan QR to inspect credentials & verified handles
                   </p>
                 </div>
@@ -713,7 +713,7 @@ export default function DigitalStudentId({
               {/* Flip Back Button */}
               <button
                 onClick={() => setIsFlipped(false)}
-                className="inline-flex items-center gap-1 px-3 py-1 min-h-[36px] rounded-xl text-xs font-semibold text-slate-600 dark:text-[#e6edf2] bg-slate-100 dark:bg-[#141f26] hover:bg-[var(--accent-light)] hover:text-[var(--accent-text)] border border-slate-200/70 dark:border-[#23333d] transition-colors cursor-pointer shadow-2xs"
+                className="inline-flex items-center gap-1 px-3 py-1 min-h-[36px] rounded-xl text-xs font-semibold text-slate-600 dark:text-[#e6edf2] bg-slate-100 dark:bg-[#131F35] hover:bg-[var(--accent-light)] hover:text-[var(--accent-text)] border border-slate-200/70 dark:border-[#24375A] transition-colors cursor-pointer shadow-2xs"
                 title="Flip back to front"
               >
                 <RotateCw className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
@@ -752,7 +752,7 @@ export default function DigitalStudentId({
                   </p>
                 </div>
 
-                <div className="p-2 rounded-xl bg-slate-50 dark:bg-[#141f26] border border-slate-200/50 dark:border-[#23333d] text-[10px] text-slate-500 dark:text-[#8e9fa8] space-y-1">
+                <div className="p-2 rounded-xl bg-slate-50 dark:bg-[#131F35] border border-slate-200/50 dark:border-[#24375A] text-[10px] text-slate-500 dark:text-[#8e9fa8] space-y-1">
                   <div className="flex items-center justify-between">
                     <span>Active Handles:</span>
                     <span className="font-bold text-slate-700 dark:text-[#e6edf2]">
@@ -774,7 +774,7 @@ export default function DigitalStudentId({
                     className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 min-h-[38px] rounded-xl text-xs font-bold shadow-2xs transition-all cursor-pointer ${
                       copied || shareSuccess
                         ? 'bg-emerald-600 dark:bg-emerald-500 text-white ring-2 ring-emerald-300 dark:ring-emerald-700 animate-nav-pop'
-                        : 'bg-[var(--accent-primary)] hover:opacity-90 text-white'
+                        : 'btn-brand-primary'
                     }`}
                     title="Share or Copy Student ID Details"
                   >
@@ -796,7 +796,7 @@ export default function DigitalStudentId({
                     target="_blank"
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 min-h-[38px] rounded-xl bg-teal-50 dark:bg-[#13282b] hover:bg-teal-100 dark:hover:bg-[#18363a] text-teal-800 dark:text-teal-300 text-xs font-bold border border-teal-200/70 dark:border-teal-800/60 transition-colors shadow-2xs"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 min-h-[38px] rounded-xl bg-[var(--accent-light)] hover:bg-[var(--accent-badge-bg)] text-[var(--accent-text)] text-xs font-bold border border-[var(--accent-light-border)] transition-colors shadow-2xs"
                     title="Open public-facing verification pass in new tab"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -832,24 +832,24 @@ export default function DigitalStudentId({
       {/* ======================================================== */}
       {/* EXPANDABLE STUDENT PORTFOLIO & FULL PROFILE SECTION      */}
       {/* ======================================================== */}
-      <div className="w-full max-w-2xl mx-auto rounded-3xl bg-white dark:bg-[#1b262d] border border-slate-200/80 dark:border-[#23333d] p-4 sm:p-5 shadow-sm space-y-3 transition-all">
+      <div className="w-full max-w-2xl mx-auto rounded-3xl bg-white dark:bg-[#1b262d] border border-slate-200/80 dark:border-[#23333d] p-3.5 sm:p-5 shadow-sm space-y-3 transition-all overflow-hidden">
         {/* Section Header with Quick Stats & Expand/Collapse button */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 min-w-0">
+          <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-xl bg-[var(--accent-light)] text-[var(--accent-primary)] flex items-center justify-center border border-[var(--accent-light-border)] shrink-0 shadow-2xs">
               <Sparkles className="w-4 h-4" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-[#e6edf2] uppercase tracking-wider">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-[#e6edf2] uppercase tracking-wider truncate">
                   Student Portfolio & Profile
                 </h3>
                 {/* Availability status badge */}
-                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 shadow-2xs">
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 shadow-2xs shrink-0">
                   {dbProfile?.availability_status || '🟢 Open to opportunities'}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 dark:text-[#8e9fa8]">
+              <p className="text-[11px] text-slate-400 dark:text-[#8e9fa8] truncate">
                 {(dbProfile?.skills?.length || 0)} Skills • {(dbProfile?.projects?.length || 0)} Projects • {(dbProfile?.work_experience?.length || 0)} Experience
               </p>
             </div>

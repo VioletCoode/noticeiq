@@ -88,7 +88,7 @@ export default function Sidebar({
                 <div
                   className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
                     isActive
-                      ? 'bg-[var(--accent-primary)] text-white shadow-2xs font-bold'
+                      ? 'bg-gradient-to-br from-[#18305A] via-[#493C62] to-[#BB81B5] text-white shadow-2xs font-bold'
                       : item.highlight
                       ? 'bg-white/15 text-white group-hover:bg-white/20'
                       : 'bg-black/20 dark:bg-white/5 text-white/80 group-hover:bg-white/15 group-hover:text-white'

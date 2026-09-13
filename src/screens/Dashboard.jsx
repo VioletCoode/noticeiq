@@ -469,7 +469,7 @@ export default function Dashboard({
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      className="p-3 sm:p-5 md:p-8 max-w-7xl mx-auto space-y-5 sm:space-y-6 animate-fade-in"
+      className="p-3 sm:p-5 md:p-8 max-w-7xl mx-auto space-y-5 sm:space-y-6 animate-fade-in w-full max-w-full overflow-x-hidden"
     >
       {/* Pull-to-refresh Visual Indicator */}
       <div
@@ -488,17 +488,17 @@ export default function Dashboard({
       
       {/* iOS PWA PROMPT BANNER */}
       {showIosBanner && !dismissIosPrompt && (
-        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-[#2b2214] border border-amber-200/80 dark:border-[#4d3a1d] flex items-center justify-between gap-3 text-xs text-amber-900 dark:text-amber-200 shadow-2xs animate-fade-in">
-          <div className="flex items-center gap-2.5">
-            <span className="p-1.5 rounded-lg bg-amber-200/60 dark:bg-[#3d2f19] text-amber-800 dark:text-amber-300 font-bold">iOS</span>
-            <span>
+        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-[#2b2214] border border-amber-200/80 dark:border-[#4d3a1d] flex items-center justify-between gap-3 text-xs text-amber-900 dark:text-amber-200 shadow-2xs animate-fade-in w-full min-w-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="p-1.5 rounded-lg bg-amber-200/60 dark:bg-[#3d2f19] text-amber-800 dark:text-amber-300 font-bold shrink-0">iOS</span>
+            <span className="min-w-0">
               <strong>Enable Push on iOS:</strong> Tap the Safari Share button and select <strong>"Add to Home Screen"</strong> to receive deadline notifications.
             </span>
           </div>
           <button 
             type="button"
             onClick={() => setDismissIosPrompt(true)}
-            className="text-amber-700 dark:text-amber-400 hover:text-amber-900 font-bold px-2 py-1 cursor-pointer"
+            className="text-amber-700 dark:text-amber-400 hover:text-amber-900 font-bold px-2 py-1 cursor-pointer shrink-0"
           >
             ✕
           </button>
@@ -507,16 +507,16 @@ export default function Dashboard({
 
       {/* DUE SOON IN-APP ALERT BANNER */}
       {dueSoonTasks.length > 0 && !dismissDueSoon && (
-        <div className="p-4 rounded-2xl bg-rose-50 dark:bg-[#2b191e] border border-rose-200/80 dark:border-rose-900/50 flex items-center justify-between gap-4 text-xs text-rose-900 dark:text-rose-200 shadow-2xs animate-fade-in">
-          <div className="flex items-center gap-3">
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-rose-50 dark:bg-[#2b191e] border border-rose-200/80 dark:border-rose-900/50 flex items-center justify-between gap-3 sm:gap-4 text-xs text-rose-900 dark:text-rose-200 shadow-2xs animate-fade-in w-full min-w-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-950 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
               <Bell className="w-4 h-4 animate-bounce" />
             </div>
-            <div>
-              <p className="font-bold">
+            <div className="min-w-0">
+              <p className="font-bold truncate">
                 {dueSoonTasks.length} {dueSoonTasks.length === 1 ? 'task is' : 'tasks are'} due within the next 24 hours!
               </p>
-              <p className="text-[11px] text-rose-700 dark:text-rose-300">
+              <p className="text-[11px] text-rose-700 dark:text-rose-300 truncate">
                 Next up: <strong>{dueSoonTasks[0].title || dueSoonTasks[0].task_name}</strong>
               </p>
             </div>
@@ -524,7 +524,7 @@ export default function Dashboard({
           <button
             type="button"
             onClick={() => setDismissDueSoon(true)}
-            className="text-xs font-bold text-rose-700 dark:text-rose-400 hover:text-rose-900 dark:hover:text-rose-200 px-2 py-1 cursor-pointer"
+            className="text-xs font-bold text-rose-700 dark:text-rose-400 hover:text-rose-900 dark:hover:text-rose-200 px-2 py-1 cursor-pointer shrink-0"
           >
             Dismiss
           </button>
@@ -532,12 +532,15 @@ export default function Dashboard({
       )}
 
       {/* GREETING / HERO SECTION */}
-      <div className="bg-white dark:bg-[#1b262d] rounded-3xl p-4 sm:p-6 md:p-8 border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6 relative overflow-hidden transition-colors">
+      <div className="bg-brand-hero rounded-3xl p-4 sm:p-6 md:p-8 border shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 relative overflow-hidden transition-colors w-full max-w-full min-w-0">
+        {/* Subtle decorative twilight glow accent in corner */}
+        <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-bl from-[var(--accent-primary)]/15 via-transparent to-transparent rounded-tr-3xl pointer-events-none" />
+
         {/* Left Column: Greeting + Task count + Capture Notice Pill Button */}
-        <div className="space-y-3 z-10 max-w-xl">
-          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+        <div className="space-y-2.5 sm:space-y-3 z-10 max-w-xl w-full min-w-0">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 min-w-0">
             {isEditingName ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 min-w-0">
                 <span className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-[#e6edf2] tracking-tight">Good morning,</span>
                 <input
                   type="text"
@@ -552,12 +555,12 @@ export default function Dashboard({
             ) : (
               <h1 
                 onClick={() => setIsEditingName(true)}
-                className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-[#e6edf2] tracking-tight flex items-center gap-2 group cursor-pointer"
+                className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-[#e6edf2] tracking-tight flex flex-wrap items-center gap-1.5 sm:gap-2 group cursor-pointer min-w-0 break-words"
                 title="Click to edit name"
               >
-                Good morning, <span className="text-[var(--accent-text)] underline decoration-[var(--accent-primary)] decoration-wavy underline-offset-4">{userName}</span>
-                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--accent-primary)] inline-block animate-pulse" aria-hidden="true" />
-                <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity ml-1" />
+                <span>Good morning,</span> <span className="text-[var(--accent-text)] underline decoration-[var(--accent-primary)] decoration-wavy underline-offset-4">{userName}</span>
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--accent-primary)] inline-block animate-pulse shrink-0" aria-hidden="true" />
+                <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity ml-1 shrink-0" />
               </h1>
             )}
 
@@ -565,7 +568,7 @@ export default function Dashboard({
               id="dashboard-play-briefing-btn"
               type="button"
               onClick={handleToggleBriefing}
-              className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 min-h-[36px] rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-800 dark:text-[#e6edf2] text-xs font-semibold border border-slate-200/70 dark:border-white/10 shadow-2xs transition-all active:scale-95 cursor-pointer"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 min-h-[36px] rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-800 dark:text-[#e6edf2] text-xs font-semibold border border-slate-200/70 dark:border-white/10 shadow-2xs transition-all active:scale-95 cursor-pointer shrink-0"
             >
               <span>{isSpeaking ? '⏹️ Stop briefing' : '🔊 Play briefing'}</span>
             </button>
@@ -575,11 +578,11 @@ export default function Dashboard({
             You have <span className="font-bold text-slate-900 dark:text-[#e6edf2]">{attentionCount}</span> {attentionCount === 1 ? 'task' : 'tasks'} that need your attention today.
           </p>
 
-          <div className="pt-1 sm:pt-2 flex items-center gap-3">
+          <div className="pt-1 sm:pt-2 flex items-center gap-3 flex-wrap">
             <button
               id="dashboard-capture-btn"
               onClick={onNavigateToCapture}
-              className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 min-h-[44px] rounded-full font-bold text-sm text-white bg-[var(--accent-primary)] hover:opacity-90 shadow-2xs hover:shadow-subtle transition-all active:scale-[0.98] cursor-pointer"
+              className="btn-brand-primary inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 min-h-[44px] rounded-full font-bold text-sm cursor-pointer active:scale-[0.98]"
             >
               <Plus className="w-4 h-4" />
               <span>Capture Notice</span>
@@ -620,69 +623,69 @@ export default function Dashboard({
         </div>
       </div>
 
-      {/* STATS ROW (4 Notion-style Minimal Stat Cards with clean subtle borders) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+      {/* STATS ROW (4 Notion-style Minimal Stat Cards in a clean 2x2 wrapping grid on mobile, 4-col on desktop) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 w-full min-w-0">
         {/* Card 1: Active Tasks */}
-        <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#1b262d] border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-2.5 sm:space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider">Active Tasks</span>
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[var(--accent-badge-bg)] text-[var(--accent-badge-text)] flex items-center justify-center border border-[var(--accent-light-border)] shadow-2xs shrink-0">
+        <div className="min-w-0 p-3 sm:p-5 rounded-2xl sm:rounded-3xl bg-[var(--bg-card)] border border-[var(--border-card)] shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-2 sm:space-y-3 overflow-hidden">
+          <div className="flex items-center justify-between gap-1 min-w-0">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider truncate">Active Tasks</span>
+            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-[var(--accent-badge-bg)] text-[var(--accent-badge-text)] flex items-center justify-center border border-[var(--accent-light-border)] shadow-2xs shrink-0">
               <ListTodo className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div>
-            <div className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight">
+          <div className="min-w-0">
+            <div className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight truncate">
               {statsData.activeCount}
             </div>
-            <p className="text-[11px] sm:text-xs text-[var(--accent-text)] font-semibold mt-0.5">Needs attention</p>
+            <p className="text-[10px] sm:text-xs text-[var(--accent-text)] font-semibold mt-0.5 truncate">Needs attention</p>
           </div>
         </div>
 
         {/* Card 2: Documents Ready */}
-        <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#1b262d] border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-2.5 sm:space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider">Docs Ready</span>
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-50 dark:bg-[#142922] text-emerald-700 dark:text-emerald-300 flex items-center justify-center border border-emerald-200/60 dark:border-[#1c483a] shadow-2xs shrink-0">
+        <div className="min-w-0 p-3 sm:p-5 rounded-2xl sm:rounded-3xl bg-[var(--bg-card)] border border-[var(--border-card)] shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-2 sm:space-y-3 overflow-hidden">
+          <div className="flex items-center justify-between gap-1 min-w-0">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider truncate">Docs Ready</span>
+            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-emerald-50 dark:bg-[#142922] text-emerald-700 dark:text-emerald-300 flex items-center justify-center border border-emerald-200/60 dark:border-[#1c483a] shadow-2xs shrink-0">
               <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div>
-            <div className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight">
+          <div className="min-w-0">
+            <div className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight truncate">
               {statsData.readyRatio}
             </div>
-            <p className="text-[11px] sm:text-xs text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5">{statsData.readyLabel}</p>
+            <p className="text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5 truncate">{statsData.readyLabel}</p>
           </div>
         </div>
 
         {/* Card 3: AI Extracted This Week */}
-        <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#1b262d] border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-2.5 sm:space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider">This Week</span>
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[var(--accent-badge-bg)] text-[var(--accent-badge-text)] flex items-center justify-center border border-[var(--accent-light-border)] shadow-2xs shrink-0">
+        <div className="min-w-0 p-3 sm:p-5 rounded-2xl sm:rounded-3xl bg-[var(--bg-card)] border border-[var(--border-card)] shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-2 sm:space-y-3 overflow-hidden">
+          <div className="flex items-center justify-between gap-1 min-w-0">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider truncate">This Week</span>
+            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-[var(--accent-badge-bg)] text-[var(--accent-badge-text)] flex items-center justify-center border border-[var(--accent-light-border)] shadow-2xs shrink-0">
               <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div>
-            <div className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight">
+          <div className="min-w-0">
+            <div className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight truncate">
               {statsData.extractedThisWeekCount}
             </div>
-            <p className="text-[11px] sm:text-xs text-[var(--accent-text)] font-semibold mt-0.5">AI Extracted</p>
+            <p className="text-[10px] sm:text-xs text-[var(--accent-text)] font-semibold mt-0.5 truncate">AI Extracted</p>
           </div>
         </div>
 
         {/* Card 4: Sync Accuracy */}
-        <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#1b262d] border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-2.5 sm:space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider">Accuracy</span>
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-50 dark:bg-[#142922] text-emerald-700 dark:text-emerald-300 flex items-center justify-center border border-emerald-200/60 dark:border-[#1c483a] shadow-2xs shrink-0">
+        <div className="min-w-0 p-3 sm:p-5 rounded-2xl sm:rounded-3xl bg-[var(--bg-card)] border border-[var(--border-card)] shadow-2xs hover:shadow-subtle transition-all flex flex-col justify-between space-y-2 sm:space-y-3 overflow-hidden">
+          <div className="flex items-center justify-between gap-1 min-w-0">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-[#8e9fa8] uppercase tracking-wider truncate">Accuracy</span>
+            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-emerald-50 dark:bg-[#142922] text-emerald-700 dark:text-emerald-300 flex items-center justify-center border border-emerald-200/60 dark:border-[#1c483a] shadow-2xs shrink-0">
               <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div>
-            <div className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight">
+          <div className="min-w-0">
+            <div className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-[#e6edf2] tracking-tight truncate">
               {statsData.syncAccuracy}
             </div>
-            <p className="text-[11px] sm:text-xs text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5">Cross-verified</p>
+            <p className="text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5 truncate">Cross-verified</p>
           </div>
         </div>
       </div>
@@ -839,9 +842,12 @@ export default function Dashboard({
         <div className="lg:col-span-5 space-y-6">
           
           {/* AI COMMAND CENTER CARD */}
-          <div className="bg-white dark:bg-[#1b262d] rounded-3xl p-6 border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs space-y-4 relative overflow-hidden transition-all">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[var(--accent-light)] text-[var(--accent-primary)] flex items-center justify-center shadow-2xs border border-[var(--accent-light-border)]">
+          <div className="card-ai-command rounded-3xl p-6 border shadow-2xs space-y-4 relative overflow-hidden transition-all">
+            {/* Subtle twilight aura in corner */}
+            <div className="absolute top-0 right-0 w-36 h-36 bg-gradient-to-bl from-[var(--accent-primary)]/15 via-transparent to-transparent pointer-events-none" />
+
+            <div className="flex items-center gap-3 relative z-10">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#18305A] via-[#493C62] to-[#BB81B5] text-white flex items-center justify-center shadow-2xs shrink-0">
                 <Bot className="w-5 h-5" />
               </div>
               <div>
@@ -850,7 +856,7 @@ export default function Dashboard({
               </div>
             </div>
 
-            <p className="text-xs text-slate-600 dark:text-[#8e9fa8] leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-[#8e9fa8] leading-relaxed relative z-10">
               NoticeIQ is continuously syncing deadlines and cross-checking important updates.
             </p>
 
@@ -873,7 +879,7 @@ export default function Dashboard({
           </div>
 
           {/* CAMPUS VAULT PANEL */}
-          <div className="bg-white dark:bg-[#1b262d] rounded-3xl p-6 border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs space-y-4 transition-all">
+          <div className="bg-[var(--bg-card)] rounded-3xl p-6 border border-[var(--border-card)] shadow-2xs space-y-4 transition-all">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#23333d]">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-full bg-[var(--accent-light)] text-[var(--accent-primary)] flex items-center justify-center shadow-2xs border border-[var(--accent-light-border)]">
@@ -929,7 +935,7 @@ export default function Dashboard({
                 return (
                   <div
                     key={doc.id}
-                    className="p-2.5 rounded-2xl border border-slate-100 dark:border-[#23333d] bg-slate-50/60 dark:bg-[#141f26] flex items-center justify-between text-xs transition-colors"
+                    className="p-2.5 rounded-2xl border border-slate-100 dark:border-[#23333d] bg-white/60 dark:bg-[#141f26] flex items-center justify-between text-xs transition-colors"
                   >
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full ${isAvailable ? 'bg-emerald-500' : 'bg-amber-400'}`}></span>
@@ -956,7 +962,7 @@ export default function Dashboard({
           </div>
 
           {/* GMAIL SYNC CARD */}
-          <div className="rounded-3xl p-6 bg-white dark:bg-[#1b262d] border border-slate-200/60 dark:border-[#23333d]/70 shadow-2xs space-y-3.5 transition-all">
+          <div className="rounded-3xl p-6 bg-[var(--bg-card)] border border-[var(--border-card)] shadow-2xs space-y-3.5 transition-all">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-950/40 border border-red-200/60 dark:border-red-900/60 flex items-center justify-center text-red-600 dark:text-red-400 shadow-2xs">
@@ -967,8 +973,7 @@ export default function Dashboard({
                     <h3 className="text-sm font-bold text-slate-900 dark:text-[#e6edf2]">Gmail Notice Sync</h3>
                     {gmailConnected && (
                       <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-[#142922] text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-[#1c483a]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        Connected
+                        <Check className="w-3 h-3" /> Connected
                       </span>
                     )}
                   </div>
@@ -998,7 +1003,7 @@ export default function Dashboard({
                   id="dashboard-connect-gmail-btn"
                   type="button"
                   onClick={handleConnectGmail}
-                  className="w-full py-2.5 px-4 min-h-[44px] rounded-xl bg-[var(--accent-primary)] hover:opacity-90 text-white font-bold text-xs transition-all shadow-2xs active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+                  className="btn-cta-orange w-full py-2.5 px-4 min-h-[44px] rounded-xl font-bold text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Mail className="w-3.5 h-3.5" />
                   <span>Connect Gmail</span>
@@ -1010,7 +1015,7 @@ export default function Dashboard({
                     type="button"
                     onClick={handleManualSync}
                     disabled={isSyncingGmail}
-                    className="flex-1 py-2.5 px-4 min-h-[44px] rounded-xl bg-[var(--accent-primary)] hover:opacity-90 text-white font-bold text-xs transition-all shadow-2xs active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+                    className="btn-cta-orange flex-1 py-2.5 px-4 min-h-[44px] rounded-xl font-bold text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isSyncingGmail ? 'animate-spin' : ''}`} />
                     <span>{isSyncingGmail ? 'Scanning...' : 'Sync Now'}</span>
