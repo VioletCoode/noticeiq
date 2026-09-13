@@ -17,9 +17,9 @@ export default defineConfig({
         'apple-touch-icon-180x180.png'
       ],
       manifest: {
-        name: 'NoticeIQ',
-        short_name: 'NoticeIQ',
-        description: 'AI-powered College Circular Extraction & Academic Command Center',
+        name: 'Campus Vault',
+        short_name: 'Campus Vault',
+        description: 'AI-powered College Circular Extraction & Campus Document Vault',
         theme_color: '#18305A',
         background_color: '#18305A',
         display: 'standalone',

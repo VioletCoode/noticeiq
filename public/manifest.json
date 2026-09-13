@@ -1,6 +1,6 @@
 {
-  "name": "NoticeIQ — AI College Command Center",
-  "short_name": "NoticeIQ",
+  "name": "Campus Vault",
+  "short_name": "Campus Vault",
   "description": "AI-powered college circular extraction, campus document vault, and deadline management.",
   "start_url": "/",
   "display": "standalone",
