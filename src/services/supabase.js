@@ -336,7 +336,16 @@ export async function updateTask(taskId, updates) {
   if (updates.title !== undefined) payload.title = updates.title;
   if (updates.task_name !== undefined) payload.title = updates.task_name;
   if (updates.deadline !== undefined) {
-    payload.deadline = updates.deadline ? parseDeadlineToISO(updates.deadline) : null;
+    if (updates.deadline) {
+      const parsed = parseDeadlineToISO(updates.deadline);
+      if (!parsed) {
+        console.warn('[NoticeIQ Supabase] Unparseable deadline string provided in updateTask:', updates.deadline);
+        throw new Error(`Unparseable deadline "${updates.deadline}". Please enter a recognizable date or format.`);
+      }
+      payload.deadline = parsed;
+    } else {
+      payload.deadline = null;
+    }
   }
   if (updates.priority !== undefined) payload.priority = updates.priority;
   if (updates.requirements !== undefined) payload.requirements = updates.requirements;

@@ -11,7 +11,8 @@ import {
   CheckCircle,
   Tag,
   Calendar,
-  AlertTriangle
+  AlertTriangle,
+  Edit3
 } from 'lucide-react';
 import { checkDocumentReadiness } from '../utils/vaultData';
 import { parseDeadlineToDateBadge, formatDisplayDeadline, getEffectivePriority } from '../utils/dateUtils';
@@ -20,6 +21,7 @@ export default function TaskCard({
   task, 
   onToggleComplete, 
   onDelete,
+  onEdit,
   vaultDocs 
 }) {
   const {
@@ -185,6 +187,18 @@ export default function TaskCard({
               {isMenuOpen && (
                 <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-[#1b262d] rounded-2xl shadow-lg border border-slate-200/70 dark:border-[#23333d] py-1 z-30 animate-popover origin-top-right text-xs">
                   <button
+                    type="button"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      if (onEdit) onEdit(task);
+                    }}
+                    className="w-full text-left px-3 py-2 min-h-[40px] text-slate-700 dark:text-[#e6edf2] hover:bg-slate-100 dark:hover:bg-[#141f26] active:scale-95 flex items-center gap-2 font-medium transition-all duration-150 cursor-pointer"
+                  >
+                    <Edit3 className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => {
                       setIsMenuOpen(false);
                       onDelete(id);

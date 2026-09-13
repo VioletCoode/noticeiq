@@ -20,10 +20,11 @@ import {
 } from 'lucide-react';
 import TaskCard from '../components/TaskCard';
 import TaskTableView from '../components/TaskTableView';
+import EditTaskModal from '../components/EditTaskModal';
 import { checkDocumentReadiness } from '../utils/vaultData';
 import { getDeadlineToComparableTimestamp, getEffectivePriority } from '../utils/dateUtils';
 import { requestNotificationPermissionAndRegister } from '../services/notifications';
-import { supabase } from '../services/supabase';
+import { supabase, updateTask } from '../services/supabase';
 import { initiateGmailOAuth, getGmailConnectionStatus, syncGmail, disconnectGmail } from '../services/gmail';
 
 const STORAGE_VIEW_MODE_KEY = 'noticeiq_task_view_mode_v1';
@@ -94,6 +95,25 @@ export default function Dashboard({
   const [showAllTasks, setShowAllTasks] = useState(false);
   const [alertEnabled, setAlertEnabled] = useState(false);
   const [isRegisteringAlerts, setIsRegisteringAlerts] = useState(false);
+
+  // Edit Task modal & confirmation toast state
+  const [editingTask, setEditingTask] = useState(null);
+  const [taskToast, setTaskToast] = useState(null);
+
+  const handleSaveEditedTask = async (taskData) => {
+    try {
+      await updateTask(taskData.id, taskData);
+      if (onRefreshTasks) {
+        await onRefreshTasks();
+      }
+      setEditingTask(null);
+      setTaskToast('Task updated, reminders rescheduled');
+      setTimeout(() => setTaskToast(null), 4000);
+    } catch (err) {
+      console.error('[Dashboard] Error updating task:', err);
+      throw err;
+    }
+  };
 
   // Gmail Sync state
   const [gmailConnected, setGmailConnected] = useState(false);
@@ -796,6 +816,7 @@ export default function Dashboard({
                   task={task}
                   onToggleComplete={onToggleComplete}
                   onDelete={onDeleteTask}
+                  onEdit={(t) => setEditingTask(t)}
                   vaultDocs={vaultDocs}
                 />
               ))}
@@ -1047,6 +1068,26 @@ export default function Dashboard({
         </div>
 
       </div>
+
+      {/* Edit Task Modal */}
+      <EditTaskModal
+        isOpen={Boolean(editingTask)}
+        task={editingTask}
+        onClose={() => setEditingTask(null)}
+        onSave={handleSaveEditedTask}
+      />
+
+      {/* Confirmation Toast Notification */}
+      {taskToast && (
+        <div 
+          className="fixed bottom-20 md:bottom-8 left-1/2 -translate-x-1/2 z-50 bg-emerald-900/95 text-white border border-emerald-500/60 backdrop-blur-md px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-xs font-bold animate-slide-up select-none"
+          role="status"
+          aria-live="polite"
+        >
+          <Check className="w-4 h-4 text-emerald-300" />
+          <span>{taskToast}</span>
+        </div>
+      )}
 
     </div>
   );
