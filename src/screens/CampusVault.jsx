@@ -15,9 +15,11 @@ import {
   Code2,
   Link2,
   UploadCloud,
-  Loader2
+  Loader2,
+  Compass
 } from 'lucide-react';
 import DigitalStudentId from '../components/DigitalStudentId';
+import RoomFinder from '../components/RoomFinder';
 import { 
   supabase, 
   fetchProfile, 
@@ -619,6 +621,36 @@ export default function CampusVault({
             );
           })}
         </div>
+      </div>
+
+      {/* ========================================================== */}
+      {/* CAMPUS INFO & DIRECTORY (PUBLIC CAMPUS DATA)              */}
+      {/* Visually separated from private vault & ID card sections   */}
+      {/* ========================================================== */}
+      <div className="pt-8 sm:pt-10 border-t-2 border-slate-200/80 dark:border-[#23333d] space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200/60 dark:border-amber-900/60 shadow-2xs shrink-0">
+              <Compass className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-[#e6edf2] tracking-tight">
+                  Campus Info &amp; Directory
+                </h2>
+                <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-[#142922] text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-[#1c483a]">
+                  Public Directory
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-[#8e9fa8] font-medium">
+                Campus-wide room numbers, labs, and facility locations (accessible to all students)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Room Finder Component */}
+        <RoomFinder />
       </div>
     </div>
   );

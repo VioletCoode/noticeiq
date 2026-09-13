@@ -322,3 +322,59 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- ----------------------------------------------------------
+-- 8. CAMPUS LOCATIONS TABLE (ROOM FINDER)
+-- Public campus room & facility directory
+-- ----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.campus_locations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  room_no TEXT NOT NULL,
+  room_name TEXT NOT NULL,
+  floor TEXT NOT NULL,
+  building TEXT DEFAULT 'Main',
+  keywords TEXT[] DEFAULT '{}',
+  floor_plan_url TEXT,
+  marker_x FLOAT,
+  marker_y FLOAT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Indexes for room lookups
+CREATE INDEX IF NOT EXISTS idx_campus_locations_room_name ON public.campus_locations (room_name);
+CREATE INDEX IF NOT EXISTS idx_campus_locations_room_no ON public.campus_locations (room_no);
+
+-- Row Level Security (RLS)
+ALTER TABLE public.campus_locations ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read access to all users
+DROP POLICY IF EXISTS "Allow public read access on campus_locations" ON public.campus_locations;
+CREATE POLICY "Allow public read access on campus_locations"
+  ON public.campus_locations FOR SELECT
+  USING (true);
+
+-- Seed campus locations with marker coordinates (percentages 0-100)
+INSERT INTO public.campus_locations (room_no, room_name, floor, building, keywords, marker_x, marker_y)
+VALUES
+  ('1-01', 'Library', 'First Floor', 'Main', ARRAY['library', 'central library', 'reading room', 'books', 'study hall', 'quiet area'], 52.0, 38.0),
+  ('2-01', 'Computer Lab 1', 'Second Floor', 'Main', ARRAY['computer lab 1', 'computer lab', 'python lab', 'programming lab', 'cse lab', 'coding lab', 'cs lab'], 74.5, 62.0),
+  ('G-01', 'Admission Cell', 'Ground Floor', 'Main', ARRAY['admission cell', 'admission office', 'admissions', 'admin office', 'registration', 'accounts desk'], 28.0, 45.0),
+  ('G-05', 'Cafeteria', 'Ground Floor', 'Main', ARRAY['cafeteria', 'canteen', 'food court', 'mess', 'cafe', 'snacks', 'lunch'], 80.0, 75.0),
+  ('3-01', 'Central Auditorium', 'Third Floor', 'Main', ARRAY['auditorium', 'central auditorium', 'seminar hall', 'main hall', 'audi', 'event hall'], 50.0, 50.0),
+  ('2-04', 'Placement & Career Cell', 'Second Floor', 'Main', ARRAY['placement cell', 'career cell', 'training and placement', 'tnp', 'placement office', 'interview room'], 42.0, 58.0)
+ON CONFLICT DO NOTHING;
+
+-- ----------------------------------------------------------
+-- 9. CAMPUS BLUEPRINTS STORAGE BUCKET
+-- Public floor plan blueprints
+-- ----------------------------------------------------------
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('campus_blueprints', 'campus_blueprints', true)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+DROP POLICY IF EXISTS "Public read access for campus_blueprints" ON storage.objects;
+CREATE POLICY "Public read access for campus_blueprints"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'campus_blueprints');
+
+
